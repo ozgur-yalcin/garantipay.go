@@ -18,12 +18,11 @@ func main() {
 	request.Terminal.ProvUserID = "PROVAUT" // Prov. Kullanıcı adı
 	// Ödeme
 	request.Order.OrderID = ""                                      // Sipariş numarası
-	request.Customer.IPAddress = "1.1.111.111"                      // Müşteri IP adresi
-	request.Customer.IPAddress = "user@example.com"                 // Müşteri mail adresi
+	request.Customer.IPAddress = "176.88.97.59"                     // Müşteri IP adresi
 	request.Card.Number = "4242424242424242"                        // Kart numarası
 	request.Card.ExpireDate = "1110"                                // Kart son kullanma tarihi
 	request.Card.CVV2 = ""                                          // Kart Cvv2 Kodu
-	request.Transaction.Amount = "1.00"                             // Satış tutarı
+	request.Transaction.Amount = "1"                                // Satış tutarı
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "sales"
@@ -33,8 +32,9 @@ func main() {
 	request.Order.AddressList.Address.GsmNumber = "" // Cep telefonu
 	password := "123qweASD"
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
-	hashdata := strings.ToUpper(garantipay.SHA1(fmt.Sprintf("%v", request.Order.OrderID) + fmt.Sprintf("%v", request.Terminal.ID) + fmt.Sprintf("%v", request.Card.Number) + fmt.Sprintf("%v", request.Transaction.Amount) + hashpassword))
-	request.Terminal.HashData = hashdata
+	hashdata := fmt.Sprintf("%v", request.Order.OrderID) + fmt.Sprintf("%v", request.Terminal.ID) + fmt.Sprintf("%v", request.Card.Number) + fmt.Sprintf("%v", request.Transaction.Amount) + hashpassword
+	fmt.Println(hashdata)
+	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
 	// 3D (varsa)
 	request.Transaction.CardholderPresentCode = 0
 	request.Transaction.Secure3D.TxnID = nil
