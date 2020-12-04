@@ -1,7 +1,11 @@
 package garantipay
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/xml"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -139,14 +143,24 @@ type Response struct {
 	} `xml:"Transaction,omitempty"`
 }
 
+func SHA1(data string) (hash string) {
+	h := sha1.New()
+	h.Write([]byte(data))
+	hash = hex.EncodeToString(h.Sum(nil))
+	return hash
+}
+
 func Transaction(request Request) (response Response) {
 	postdata, _ := xml.Marshal(request)
+	fmt.Println(string(postdata))
 	res, err := http.Post(EndPoints[request.Mode.(string)], "text/xml; charset=utf-8", strings.NewReader(strings.ToLower(xml.Header)+string(postdata)))
 	if err != nil {
 		log.Println(err)
 		return response
 	}
 	defer res.Body.Close()
+	data, _ := ioutil.ReadAll(res.Body)
+	fmt.Println(string(data))
 	decoder := xml.NewDecoder(res.Body)
 	decoder.CharsetReader = charset.NewReaderLabel
 	decoder.Decode(&response)
