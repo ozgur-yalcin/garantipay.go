@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	api := &garantipay.API{"test"} // "test","prod"
-	request := &garantipay.Request{}
+	api := garantipay.API{"test"} // "test","prod"
+	request := garantipay.Request{}
 	request.Terminal.ID = ""                // Kullanıcı adı
 	request.Terminal.MerchantID = ""        // Müşteri No
 	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
