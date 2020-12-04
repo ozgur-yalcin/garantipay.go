@@ -42,7 +42,7 @@ var password = "123qweASD";
 document.getElementById("txntimestamp").value = new Date().getTime();
 var	hashpass = CryptoJS.SHA1(password + document.getElementById("terminalid").value.padStart(9, "0")).toString(CryptoJS.enc.Base64).toUpperCase();
 var hashstr = document.getElementById("terminalid").value + document.getElementById("orderid").value + document.getElementById("txnamount").value + document.getElementById("successurl").value + document.getElementById("errorurl").value + document.getElementById("txntype").value + securekey + hashpass;
-document.getElementById("secure3dhash").value = CryptoJS.SHA1(hashstr).toString(CryptoJS.enc.Base64);
+document.getElementById("secure3dhash").value = CryptoJS.SHA1(hashstr).toString(CryptoJS.enc.Base64).toUpperCase();
 </script>
 </body>
 </html>
