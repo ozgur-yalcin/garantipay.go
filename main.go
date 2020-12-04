@@ -15,13 +15,13 @@ func main() {
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
 	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
-	request.Terminal.ProvUserID = "PROVAUT" // Prov. Kullanıcı adı
-	// Ödeme
-	request.Order.OrderID = ""                                      // Sipariş numarası
-	request.Customer.IPAddress = "127.0.0.1"                        // Müşteri IP adresi
+	request.Terminal.ProvUserID = "PROVAUT" // Prov. Kullanıcı adı (satış için)
+	// Satış
+	request.Order.OrderID = ""                                      // Sipariş numarası (boş bırakılacak)
+	request.Customer.IPAddress = "127.0.0.1"                        // Müşteri IP adresi (zorunlu)
 	request.Card.Number = "4242424242424242"                        // Kart numarası
 	request.Card.ExpireDate = "1110"                                // Son kullanma tarihi (Ay ve Yılın son 2 hanesi) MMYY
-	request.Card.CVV2 = ""                                          // Cvv2 Kodu
+	request.Card.CVV2 = ""                                          // Cvv2 Kodu (kartın arka yüzündeki 3 haneli numara)
 	request.Transaction.Amount = "100"                              // Satış tutarı (1,00 TL -> 100) Son 2 hane kuruş
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
