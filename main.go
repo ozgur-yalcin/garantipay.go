@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"strings"
 
@@ -41,6 +41,6 @@ func main() {
 	request.Transaction.Secure3D.SecurityLevel = nil
 	request.Transaction.Secure3D.AuthenticationCode = nil
 	response := garantipay.Transaction(request)
-	pretty, _ := json.MarshalIndent(response, " ", " ")
+	pretty, _ := xml.Marshal(response)
 	fmt.Println(string(pretty))
 }

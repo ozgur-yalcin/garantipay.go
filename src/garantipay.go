@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -122,6 +121,14 @@ type Response struct {
 	} `xml:"Order,omitempty"`
 
 	Transaction struct {
+		Response struct {
+			Source     interface{} `xml:"Source,omitempty"`
+			Code       interface{} `xml:"Code,omitempty"`
+			ReasonCode interface{} `xml:"ReasonCode,omitempty"`
+			Message    interface{} `xml:"Message,omitempty"`
+			ErrorMsg   interface{} `xml:"ErrorMsg,omitempty"`
+			SysErrMsg  interface{} `xml:"SysErrMsg,omitempty"`
+		} `xml:"Response,omitempty"`
 		RetrefNum        interface{} `xml:"RetrefNum,omitempty"`
 		AuthCode         interface{} `xml:"AuthCode,omitempty"`
 		BatchNum         interface{} `xml:"BatchNum,omitempty"`
@@ -132,14 +139,11 @@ type Response struct {
 		CardType         interface{} `xml:"CardType,omitempty"`
 		HashData         interface{} `xml:"HashData,omitempty"`
 		HostMsgList      interface{} `xml:"HostMsgList,omitempty"`
-		Response         struct {
-			Source     interface{} `xml:"Source,omitempty"`
-			Code       interface{} `xml:"Code,omitempty"`
-			ReasonCode interface{} `xml:"ReasonCode,omitempty"`
-			Message    interface{} `xml:"Message,omitempty"`
-			ErrorMsg   interface{} `xml:"ErrorMsg,omitempty"`
-			SysErrMsg  interface{} `xml:"SysErrMsg,omitempty"`
-		} `xml:"Response,omitempty"`
+		RewardInqResult  struct {
+			RewardList interface{} `xml:"RewardList,omitempty"`
+			ChequeList interface{} `xml:"ChequeList,omitempty"`
+		} `xml:"RewardInqResult,omitempty"`
+		GarantiCardInd interface{} `xml:"GarantiCardInd,omitempty"`
 	} `xml:"Transaction,omitempty"`
 }
 
@@ -159,8 +163,6 @@ func Transaction(request Request) (response Response) {
 		return response
 	}
 	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(string(data))
 	decoder := xml.NewDecoder(res.Body)
 	decoder.CharsetReader = charset.NewReaderLabel
 	decoder.Decode(&response)
