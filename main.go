@@ -13,7 +13,7 @@ func main() {
 	request.Terminal.ProvUserID = "PROVAUT" // Kullanıcı adı
 	// Ödeme
 	request.Transaction.Type = "Auth"
-	request.Mode = "P"                                              // TEST : "T" - PRODUCTION "P"
+	request.Mode = "TEST"                                           // TEST : "TEST" - PRODUCTION "PROD"
 	request.Customer.IPAddress = ""                                 // Müşteri IP adresi
 	request.Card.Number = ""                                        // Kart numarası
 	request.Card.ExpireDate = "xx/xx"                               // Kart son kullanma tarihi
