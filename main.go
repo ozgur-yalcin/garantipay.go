@@ -20,14 +20,13 @@ func main() {
 	request.Order.OrderID = ""                                      // Sipariş numarası
 	request.Customer.IPAddress = "127.0.0.1"                        // Müşteri IP adresi
 	request.Card.Number = "4242424242424242"                        // Kart numarası
-	request.Card.ExpireDate = "1110"                                // Kart son kullanma tarihi
-	request.Card.CVV2 = ""                                          // Kart Cvv2 Kodu
-	request.Transaction.Amount = "1"                                // Satış tutarı
+	request.Card.ExpireDate = "1110"                                // Son kullanma tarihi (Ay ve Yılın son 2 hanesi) MMYY
+	request.Card.CVV2 = ""                                          // Cvv2 Kodu
+	request.Transaction.Amount = "100"                              // Satış tutarı (1,00 TL -> 100) Son 2 hane kuruş
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "sales"
 	request.Order.AddressList.Address.Type = "B"
-	request.Order.AddressList.Address.Name = ""      // Kart sahibi
 	request.Order.AddressList.Address.Company = ""   // Fatura unvanı
 	request.Order.AddressList.Address.GsmNumber = "" // Cep telefonu
 	password := "123qweASD"
