@@ -24,7 +24,7 @@ import (
 func main() {
 	request := garantipay.Request{}
 	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
-	request.Version = "v0.00"
+	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
 	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
@@ -72,7 +72,7 @@ import (
 func main() {
 	request := garantipay.Request{}
 	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
-	request.Version = "v0.00"
+	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
 	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
@@ -109,7 +109,7 @@ import (
 func main() {
 	request := garantipay.Request{}
 	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
-	request.Version = "v0.00"
+	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
 	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı

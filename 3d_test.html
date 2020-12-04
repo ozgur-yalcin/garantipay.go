@@ -1,0 +1,46 @@
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
+<body>
+<center>
+<form action="http://sanalposprovtest.garanti.com.tr/servlet/gt3dengine" method="post">
+<div>Kart sahibi</div>
+<div><input type="text" name="cardowner" style="width:160px;"></div>
+<div>Kart numarası</div>
+<div><input type="text" name="cardnumber" placeholder="xxxx xxxx xxxx xxxx" style="width:155px;" maxlength="16"></div>
+<div>Son kullanma tarihi</div>
+<div><input type="text" name="cardexpiredatemonth" placeholder="xx" style="width:45px;text-align:center;" maxlength="2"> / <input type="text" name="cardexpiredateyear" id="expyear" placeholder="xx" style="width:45px;text-align:center;" maxlength="2"> ay/yıl</div>
+<div>CVC</div>
+<div><input type="text" name="cardcvv2" placeholder="xxx" style="width:55px;text-align:center;" maxlength="3"></div>
+<div style="margin-top:4px;"><input type="submit" value="Öde"></div>
+<input type="hidden" name="secure3dsecuritylevel" id="secure3dsecuritylevel" value="3D">
+<input type="hidden" name="apiversion" id="apiversion" value="v1.0">
+<input type="hidden" name="terminaluserid" id="terminaluserid" value="PROVAUT">
+<input type="hidden" name="terminalprovuserid" id="terminalprovuserid" value="PROVOOS">
+<input type="hidden" name="terminalid" id="terminalid" value="Terminal No">
+<input type="hidden" name="terminalmerchantid" id="terminalmerchantid" value="İşyeri No">
+<input type="hidden" name="companyname" id="companyname" value="İşyeri adı">
+<input type="hidden" name="customeripaddress" id="customeripaddress" value="Ip adresi">
+<input type="hidden" name="customeripaddress" id="customeremailaddress">
+<input type="hidden" name="txntype" id="txntype" value="sales">
+<input type="hidden" name="txnamount" id="txnamount" value="100">
+<input type="hidden" name="txncurrencycode" id="txncurrencycode" value="949">
+<input type="hidden" name="orderid" id="orderid" value="">
+<input type="hidden" name="successurl" id="successurl" value="başarılı işlem sonrası dönülecek adres">
+<input type="hidden" name="errorurl" id="errorurl" value="hatalı işlem sonrası dönülecek adres">
+<input type="hidden" name="txntimestamp" id="txntimestamp" value="">
+<input type="hidden" name="secure3dhash" id="secure3dhash" value="">
+<input type="hidden" name="refreshtime" id="refreshtime" value="60">
+<input type="hidden" name="lang" id="lang" value="tr">
+</form>
+</center>
+<script>
+// bu kısım test etmek için yazılmıştır. buradaki işlem backend tarafında yapılmalıdır !
+var securekey = "12345678";
+document.getElementById("txntimestamp").value = new Date().getTime();
+var hashstr = document.getElementById("terminalId").value + document.getElementById("orderid").value + document.getElementById("txnamount").value + document.getElementById("successurl").value + document.getElementById("errorurl").value + document.getElementById("txntype").value + securekey;
+document.getElementById("secure3dhash").value = CryptoJS.SHA1(hashstr).toString(CryptoJS.enc.Base64);
+</script>
+</body>
+</html>
