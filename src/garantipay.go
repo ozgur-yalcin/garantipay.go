@@ -26,9 +26,10 @@ var Currencies map[string]string = map[string]string{
 }
 
 type Request struct {
-	XMLName xml.Name    `xml:"GVPSRequest,omitempty"`
-	Mode    interface{} `xml:"Mode,omitempty"`
-	Version interface{} `xml:"Version,omitempty"`
+	XMLName     xml.Name    `xml:"GVPSRequest,omitempty"`
+	Mode        interface{} `xml:"Mode,omitempty"`
+	Version     interface{} `xml:"Version,omitempty"`
+	ChannelCode interface{} `xml:"ChannelCode,omitempty"`
 
 	Terminal struct {
 		MerchantID interface{} `xml:"MerchantID,omitempty"`
@@ -50,12 +51,30 @@ type Request struct {
 	} `xml:"Card,omitempty"`
 
 	Order struct {
-		OrderID interface{} `xml:"OrderID,omitempty"`
-		GroupID interface{} `xml:"GroupID,omitempty"`
+		OrderID     interface{} `xml:"OrderID,omitempty"`
+		GroupID     interface{} `xml:"GroupID,omitempty"`
+		AddressList struct {
+			Address struct {
+				Type        interface{} `xml:"Type,omitempty"`
+				Name        interface{} `xml:"Name,omitempty"`
+				LastName    interface{} `xml:"LastName,omitempty"`
+				Company     interface{} `xml:"Company,omitempty"`
+				Text        interface{} `xml:"Text,omitempty"`
+				City        interface{} `xml:"City,omitempty"`
+				District    interface{} `xml:"District,omitempty"`
+				Country     interface{} `xml:"Country,omitempty"`
+				PostalCode  interface{} `xml:"PostalCode,omitempty"`
+				PhoneNumber interface{} `xml:"PhoneNumber,omitempty"`
+				GsmNumber   interface{} `xml:"GsmNumber,omitempty"`
+				FaxNumber   interface{} `xml:"FaxNumber,omitempty"`
+			} `xml:"Address,omitempty"`
+		} `xml:"AddressList,omitempty"`
 	} `xml:"Order,omitempty"`
 
 	Transaction struct {
 		Type                  interface{} `xml:"Type,omitempty"`
+		SubType               interface{} `xml:"SubType,omitempty"`
+		FirmCardNo            interface{} `xml:"FirmCardNo,omitempty"`
 		InstallmentCnt        interface{} `xml:"InstallmentCnt,omitempty"`
 		Amount                interface{} `xml:"Amount,omitempty"`
 		CurrencyCode          interface{} `xml:"CurrencyCode,omitempty"`
@@ -109,11 +128,7 @@ type Response struct {
 		CardType         interface{} `xml:"CardType,omitempty"`
 		HashData         interface{} `xml:"HashData,omitempty"`
 		HostMsgList      interface{} `xml:"HostMsgList,omitempty"`
-		RewardInqResult  struct {
-			RewardList interface{} `xml:"RewardList,omitempty"`
-			ChequeList interface{} `xml:"ChequeList,omitempty"`
-		} `xml:"RewardInqResult,omitempty"`
-		Response struct {
+		Response         struct {
 			Source     interface{} `xml:"Source,omitempty"`
 			Code       interface{} `xml:"Code,omitempty"`
 			ReasonCode interface{} `xml:"ReasonCode,omitempty"`
