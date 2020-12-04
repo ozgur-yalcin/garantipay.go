@@ -1,4 +1,4 @@
-[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/OzqurYalcin/garantipay/blob/master/LICENSE.md)
+[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/OzqurYalcin/garantipay/blob/main/LICENSE.md)
 [![documentation](https://pkg.go.dev/badge/github.com/OzqurYalcin/garantipay)](https://pkg.go.dev/github.com/OzqurYalcin/garantipay/src)
 
 # Nestpay
