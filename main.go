@@ -18,7 +18,7 @@ func main() {
 	request.Terminal.ProvUserID = "PROVAUT" // Prov. Kullanıcı adı
 	// Ödeme
 	request.Order.OrderID = ""                                      // Sipariş numarası
-	request.Customer.IPAddress = "176.88.97.59"                     // Müşteri IP adresi
+	request.Customer.IPAddress = "127.0.0.1"                        // Müşteri IP adresi
 	request.Card.Number = "4242424242424242"                        // Kart numarası
 	request.Card.ExpireDate = "1110"                                // Kart son kullanma tarihi
 	request.Card.CVV2 = ""                                          // Kart Cvv2 Kodu
