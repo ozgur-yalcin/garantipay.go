@@ -5,11 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
-
-	"golang.org/x/net/html/charset"
 )
 
 var EndPoints map[string]string = map[string]string{
@@ -156,15 +155,14 @@ func SHA1(data string) (hash string) {
 
 func Transaction(request Request) (response Response) {
 	postdata, _ := xml.Marshal(request)
-	fmt.Println(string(postdata))
 	res, err := http.Post(EndPoints[request.Mode.(string)], "text/xml; charset=utf-8", strings.NewReader(strings.ToLower(xml.Header)+string(postdata)))
 	if err != nil {
 		log.Println(err)
 		return response
 	}
 	defer res.Body.Close()
-	decoder := xml.NewDecoder(res.Body)
-	decoder.CharsetReader = charset.NewReaderLabel
-	decoder.Decode(&response)
+	data, _ := ioutil.ReadAll(res.Body)
+	fmt.Println(string(data))
+	xml.Unmarshal([]byte(strings.ToLower(xml.Header)+string(data)), &response)
 	return response
 }

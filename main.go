@@ -32,7 +32,7 @@ func main() {
 	request.Order.AddressList.Address.GsmNumber = "" // Cep telefonu
 	password := "123qweASD"
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
-	hashdata := fmt.Sprintf("%v", request.Order.OrderID) + fmt.Sprintf("%v", request.Terminal.ID) + fmt.Sprintf("%v", request.Card.Number) + fmt.Sprintf("%v", request.Transaction.Amount) + hashpassword
+	hashdata := request.Order.OrderID.(string) + request.Terminal.ID.(string) + request.Card.Number.(string) + request.Transaction.Amount.(string) + hashpassword
 	fmt.Println(hashdata)
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
 	// 3D (varsa)
@@ -41,6 +41,7 @@ func main() {
 	request.Transaction.Secure3D.SecurityLevel = nil
 	request.Transaction.Secure3D.AuthenticationCode = nil
 	response := garantipay.Transaction(request)
-	pretty, _ := xml.Marshal(response)
+	fmt.Println(response.Terminal.ProvUserID)
+	pretty, _ := xml.MarshalIndent(response, " ", " ")
 	fmt.Println(string(pretty))
 }
