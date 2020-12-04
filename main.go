@@ -5,14 +5,12 @@ import (
 )
 
 func main() {
-	api := garantipay.API{"test"} // "test","prod"
 	request := garantipay.Request{}
 	request.Terminal.ID = ""                // Kullanıcı adı
 	request.Terminal.MerchantID = ""        // Müşteri No
 	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
 	request.Terminal.ProvUserID = "PROVAUT" // Kullanıcı adı
 	// Ödeme
-	request.Transaction.Type = "Auth"
 	request.Mode = "TEST"                                           // TEST : "TEST" - PRODUCTION "PROD"
 	request.Customer.IPAddress = ""                                 // Müşteri IP adresi
 	request.Card.Number = ""                                        // Kart numarası
@@ -21,10 +19,11 @@ func main() {
 	request.Transaction.Amount = "0.00"                             // Satış tutarı
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
+	request.Transaction.Type = "Auth"
 	// 3D (varsa)
 	request.Transaction.CardholderPresentCode = nil
 	request.Transaction.Secure3D.TxnID = nil
 	request.Transaction.Secure3D.SecurityLevel = nil
 	request.Transaction.Secure3D.AuthenticationCode = nil
-	api.Transaction(request)
+	garantipay.Transaction(request)
 }

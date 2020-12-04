@@ -25,10 +25,6 @@ var Currencies map[string]string = map[string]string{
 	"JPY": "392",
 }
 
-type API struct {
-	Bank string
-}
-
 type Request struct {
 	XMLName xml.Name    `xml:"GVPSRequest,omitempty"`
 	Mode    interface{} `xml:"Mode,omitempty"`
@@ -76,17 +72,62 @@ type Request struct {
 }
 
 type Response struct {
-	XMLName        xml.Name `xml:"GVPSResponse,omitempty"`
-	AuthCode       string   `xml:"AuthCode,omitempty"`
-	HostRefNum     string   `xml:"HostRefNum,omitempty"`
-	ProcReturnCode string   `xml:"ProcReturnCode,omitempty"`
-	ErrMsg         string   `xml:"ErrMsg,omitempty"`
+	XMLName xml.Name    `xml:"GVPSResponse,omitempty"`
+	Mode    interface{} `xml:"Mode,omitempty"`
+
+	Terminal struct {
+		MerchantID interface{} `xml:"MerchantID,omitempty"`
+		ProvUserID interface{} `xml:"ProvUserID,omitempty"`
+		UserID     interface{} `xml:"UserID,omitempty"`
+		ID         interface{} `xml:"ID,omitempty"`
+	} `xml:"Terminal,omitempty"`
+
+	Customer struct {
+		IPAddress    interface{} `xml:"IPAddress,omitempty"`
+		EmailAddress interface{} `xml:"EmailAddress,omitempty"`
+	} `xml:"Customer,omitempty"`
+
+	Card struct {
+		Number     interface{} `xml:"Number,omitempty"`
+		ExpireDate interface{} `xml:"ExpireDate,omitempty"`
+		CVV2       interface{} `xml:"CVV2,omitempty"`
+	} `xml:"Card,omitempty"`
+
+	Order struct {
+		OrderID interface{} `xml:"OrderID,omitempty"`
+		GroupID interface{} `xml:"GroupID,omitempty"`
+	} `xml:"Order,omitempty"`
+
+	Transaction struct {
+		RetrefNum        interface{} `xml:"RetrefNum,omitempty"`
+		AuthCode         interface{} `xml:"AuthCode,omitempty"`
+		BatchNum         interface{} `xml:"BatchNum,omitempty"`
+		SequenceNum      interface{} `xml:"SequenceNum,omitempty"`
+		ProvDate         interface{} `xml:"ProvDate,omitempty"`
+		CardNumberMasked interface{} `xml:"CardNumberMasked,omitempty"`
+		CardHolderName   interface{} `xml:"CardHolderName,omitempty"`
+		CardType         interface{} `xml:"CardType,omitempty"`
+		HashData         interface{} `xml:"HashData,omitempty"`
+		HostMsgList      interface{} `xml:"HostMsgList,omitempty"`
+		RewardInqResult  struct {
+			RewardList interface{} `xml:"RewardList,omitempty"`
+			ChequeList interface{} `xml:"ChequeList,omitempty"`
+		} `xml:"RewardInqResult,omitempty"`
+		Response struct {
+			Source     interface{} `xml:"Source,omitempty"`
+			Code       interface{} `xml:"Code,omitempty"`
+			ReasonCode interface{} `xml:"ReasonCode,omitempty"`
+			Message    interface{} `xml:"Message,omitempty"`
+			ErrorMsg   interface{} `xml:"ErrorMsg,omitempty"`
+			SysErrMsg  interface{} `xml:"SysErrMsg,omitempty"`
+		} `xml:"Response,omitempty"`
+	} `xml:"Transaction,omitempty"`
 }
 
-func (api API) Transaction(request Request) (response Response) {
+func Transaction(request Request) (response Response) {
 	response = Response{}
 	postdata, _ := xml.Marshal(request)
-	res, err := http.Post(EndPoints[api.Bank], "text/xml; charset=utf-8", strings.NewReader(strings.ToLower(xml.Header)+string(postdata)))
+	res, err := http.Post(EndPoints[request.Mode.(string)], "text/xml; charset=utf-8", strings.NewReader(strings.ToLower(xml.Header)+string(postdata)))
 	if err != nil {
 		log.Println(err)
 		return response
