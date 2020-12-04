@@ -27,8 +27,8 @@ func main() {
 	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "sales"
 	request.Order.AddressList.Address.Type = "B"
-	request.Order.AddressList.Address.Company = ""   // Fatura unvanı
-	request.Order.AddressList.Address.GsmNumber = "" // Cep telefonu
+	request.Order.AddressList.Address.Company = ""     // Fatura unvanı
+	request.Order.AddressList.Address.PhoneNumber = "" // Telefon numarası
 	password := "123qweASD"
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
 	hashdata := request.Order.OrderID + request.Terminal.ID + request.Card.Number + request.Transaction.Amount + hashpassword
