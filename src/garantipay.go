@@ -10,8 +10,8 @@ import (
 )
 
 var EndPoints map[string]string = map[string]string{
-	"test": "https://sanalposprovtest.garanti.com.tr/VPServlet",
-	"prod": "https://sanalposprov.garanti.com.tr/VPServlet",
+	"TEST": "https://sanalposprovtest.garanti.com.tr/VPServlet",
+	"PROD": "https://sanalposprov.garanti.com.tr/VPServlet",
 }
 
 var Currencies map[string]string = map[string]string{
