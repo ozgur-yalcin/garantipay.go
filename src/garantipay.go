@@ -1,14 +1,12 @@
 package garantipay
 
 import (
+	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/xml"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 )
 
 var EndPoints map[string]string = map[string]string{
@@ -28,121 +26,121 @@ var Currencies map[string]string = map[string]string{
 }
 
 type Request struct {
-	XMLName     xml.Name    `xml:"GVPSRequest,omitempty"`
-	Mode        interface{} `xml:"Mode,omitempty"`
-	Version     interface{} `xml:"Version,omitempty"`
-	ChannelCode interface{} `xml:"ChannelCode,omitempty"`
+	XMLName     xml.Name `xml:"GVPSRequest,omitempty"`
+	Mode        string   `xml:"Mode,omitempty"`
+	Version     string   `xml:"Version,omitempty"`
+	ChannelCode string   `xml:"ChannelCode,omitempty"`
 
 	Terminal struct {
-		MerchantID interface{} `xml:"MerchantID,omitempty"`
-		ProvUserID interface{} `xml:"ProvUserID,omitempty"`
-		UserID     interface{} `xml:"UserID,omitempty"`
-		ID         interface{} `xml:"ID,omitempty"`
-		HashData   interface{} `xml:"HashData,omitempty"`
+		MerchantID string `xml:"MerchantID,omitempty"`
+		ProvUserID string `xml:"ProvUserID,omitempty"`
+		UserID     string `xml:"UserID,omitempty"`
+		ID         string `xml:"ID,omitempty"`
+		HashData   string `xml:"HashData,omitempty"`
 	} `xml:"Terminal,omitempty"`
 
 	Customer struct {
-		IPAddress    interface{} `xml:"IPAddress,omitempty"`
-		EmailAddress interface{} `xml:"EmailAddress,omitempty"`
+		IPAddress    string `xml:"IPAddress,omitempty"`
+		EmailAddress string `xml:"EmailAddress,omitempty"`
 	} `xml:"Customer,omitempty"`
 
 	Card struct {
-		Number     interface{} `xml:"Number,omitempty"`
-		ExpireDate interface{} `xml:"ExpireDate,omitempty"`
-		CVV2       interface{} `xml:"CVV2,omitempty"`
+		Number     string `xml:"Number,omitempty"`
+		ExpireDate string `xml:"ExpireDate,omitempty"`
+		CVV2       string `xml:"CVV2,omitempty"`
 	} `xml:"Card,omitempty"`
 
 	Order struct {
-		OrderID     interface{} `xml:"OrderID,omitempty"`
-		GroupID     interface{} `xml:"GroupID,omitempty"`
+		OrderID     string `xml:"OrderID,omitempty"`
+		GroupID     string `xml:"GroupID,omitempty"`
 		AddressList struct {
 			Address struct {
-				Type        interface{} `xml:"Type,omitempty"`
-				Name        interface{} `xml:"Name,omitempty"`
-				LastName    interface{} `xml:"LastName,omitempty"`
-				Company     interface{} `xml:"Company,omitempty"`
-				Text        interface{} `xml:"Text,omitempty"`
-				City        interface{} `xml:"City,omitempty"`
-				District    interface{} `xml:"District,omitempty"`
-				Country     interface{} `xml:"Country,omitempty"`
-				PostalCode  interface{} `xml:"PostalCode,omitempty"`
-				PhoneNumber interface{} `xml:"PhoneNumber,omitempty"`
-				GsmNumber   interface{} `xml:"GsmNumber,omitempty"`
-				FaxNumber   interface{} `xml:"FaxNumber,omitempty"`
+				Type        string `xml:"Type,omitempty"`
+				Name        string `xml:"Name,omitempty"`
+				LastName    string `xml:"LastName,omitempty"`
+				Company     string `xml:"Company,omitempty"`
+				Text        string `xml:"Text,omitempty"`
+				City        string `xml:"City,omitempty"`
+				District    string `xml:"District,omitempty"`
+				Country     string `xml:"Country,omitempty"`
+				PostalCode  string `xml:"PostalCode,omitempty"`
+				PhoneNumber string `xml:"PhoneNumber,omitempty"`
+				GsmNumber   string `xml:"GsmNumber,omitempty"`
+				FaxNumber   string `xml:"FaxNumber,omitempty"`
 			} `xml:"Address,omitempty"`
 		} `xml:"AddressList,omitempty"`
 	} `xml:"Order,omitempty"`
 
 	Transaction struct {
-		Type                  interface{} `xml:"Type,omitempty"`
-		SubType               interface{} `xml:"SubType,omitempty"`
-		FirmCardNo            interface{} `xml:"FirmCardNo,omitempty"`
-		InstallmentCnt        interface{} `xml:"InstallmentCnt,omitempty"`
-		Amount                interface{} `xml:"Amount,omitempty"`
-		CurrencyCode          interface{} `xml:"CurrencyCode,omitempty"`
-		CardholderPresentCode interface{} `xml:"CardholderPresentCode,omitempty"`
-		MotoInd               interface{} `xml:"MotoInd,omitempty"`
-		Description           interface{} `xml:"Description,omitempty"`
+		Type                  string `xml:"Type,omitempty"`
+		SubType               string `xml:"SubType,omitempty"`
+		FirmCardNo            string `xml:"FirmCardNo,omitempty"`
+		InstallmentCnt        string `xml:"InstallmentCnt,omitempty"`
+		Amount                string `xml:"Amount,omitempty"`
+		CurrencyCode          string `xml:"CurrencyCode,omitempty"`
+		CardholderPresentCode string `xml:"CardholderPresentCode,omitempty"`
+		MotoInd               string `xml:"MotoInd,omitempty"`
+		Description           string `xml:"Description,omitempty"`
 		Secure3D              struct {
-			AuthenticationCode interface{} `xml:"AuthenticationCode,omitempty"`
-			SecurityLevel      interface{} `xml:"SecurityLevel,omitempty"`
-			TxnID              interface{} `xml:"TxnID,omitempty"`
-			Md                 interface{} `xml:"Md,omitempty"`
+			AuthenticationCode string `xml:"AuthenticationCode,omitempty"`
+			SecurityLevel      string `xml:"SecurityLevel,omitempty"`
+			TxnID              string `xml:"TxnID,omitempty"`
+			Md                 string `xml:"Md,omitempty"`
 		} `xml:"Secure3D,omitempty"`
 	} `xml:"Transaction,omitempty"`
 }
 
 type Response struct {
-	XMLName xml.Name    `xml:"GVPSResponse,omitempty"`
-	Mode    interface{} `xml:"Mode,omitempty"`
+	XMLName xml.Name `xml:"GVPSResponse,omitempty"`
+	Mode    string   `xml:"Mode,omitempty"`
 
 	Terminal struct {
-		MerchantID interface{} `xml:"MerchantID,omitempty"`
-		ProvUserID interface{} `xml:"ProvUserID,omitempty"`
-		UserID     interface{} `xml:"UserID,omitempty"`
-		ID         interface{} `xml:"ID,omitempty"`
+		MerchantID string `xml:"MerchantID,omitempty"`
+		ProvUserID string `xml:"ProvUserID,omitempty"`
+		UserID     string `xml:"UserID,omitempty"`
+		ID         string `xml:"ID,omitempty"`
 	} `xml:"Terminal,omitempty"`
 
 	Customer struct {
-		IPAddress    interface{} `xml:"IPAddress,omitempty"`
-		EmailAddress interface{} `xml:"EmailAddress,omitempty"`
+		IPAddress    string `xml:"IPAddress,omitempty"`
+		EmailAddress string `xml:"EmailAddress,omitempty"`
 	} `xml:"Customer,omitempty"`
 
 	Card struct {
-		Number     interface{} `xml:"Number,omitempty"`
-		ExpireDate interface{} `xml:"ExpireDate,omitempty"`
-		CVV2       interface{} `xml:"CVV2,omitempty"`
+		Number     string `xml:"Number,omitempty"`
+		ExpireDate string `xml:"ExpireDate,omitempty"`
+		CVV2       string `xml:"CVV2,omitempty"`
 	} `xml:"Card,omitempty"`
 
 	Order struct {
-		OrderID interface{} `xml:"OrderID,omitempty"`
-		GroupID interface{} `xml:"GroupID,omitempty"`
+		OrderID string `xml:"OrderID,omitempty"`
+		GroupID string `xml:"GroupID,omitempty"`
 	} `xml:"Order,omitempty"`
 
 	Transaction struct {
 		Response struct {
-			Source     interface{} `xml:"Source,omitempty"`
-			Code       interface{} `xml:"Code,omitempty"`
-			ReasonCode interface{} `xml:"ReasonCode,omitempty"`
-			Message    interface{} `xml:"Message,omitempty"`
-			ErrorMsg   interface{} `xml:"ErrorMsg,omitempty"`
-			SysErrMsg  interface{} `xml:"SysErrMsg,omitempty"`
+			Source     string `xml:"Source,omitempty"`
+			Code       string `xml:"Code,omitempty"`
+			ReasonCode string `xml:"ReasonCode,omitempty"`
+			Message    string `xml:"Message,omitempty"`
+			ErrorMsg   string `xml:"ErrorMsg,omitempty"`
+			SysErrMsg  string `xml:"SysErrMsg,omitempty"`
 		} `xml:"Response,omitempty"`
-		RetrefNum        interface{} `xml:"RetrefNum,omitempty"`
-		AuthCode         interface{} `xml:"AuthCode,omitempty"`
-		BatchNum         interface{} `xml:"BatchNum,omitempty"`
-		SequenceNum      interface{} `xml:"SequenceNum,omitempty"`
-		ProvDate         interface{} `xml:"ProvDate,omitempty"`
-		CardNumberMasked interface{} `xml:"CardNumberMasked,omitempty"`
-		CardHolderName   interface{} `xml:"CardHolderName,omitempty"`
-		CardType         interface{} `xml:"CardType,omitempty"`
-		HashData         interface{} `xml:"HashData,omitempty"`
-		HostMsgList      interface{} `xml:"HostMsgList,omitempty"`
+		RetrefNum        string `xml:"RetrefNum,omitempty"`
+		AuthCode         string `xml:"AuthCode,omitempty"`
+		BatchNum         string `xml:"BatchNum,omitempty"`
+		SequenceNum      string `xml:"SequenceNum,omitempty"`
+		ProvDate         string `xml:"ProvDate,omitempty"`
+		CardNumberMasked string `xml:"CardNumberMasked,omitempty"`
+		CardHolderName   string `xml:"CardHolderName,omitempty"`
+		CardType         string `xml:"CardType,omitempty"`
+		HashData         string `xml:"HashData,omitempty"`
+		HostMsgList      string `xml:"HostMsgList,omitempty"`
 		RewardInqResult  struct {
-			RewardList interface{} `xml:"RewardList,omitempty"`
-			ChequeList interface{} `xml:"ChequeList,omitempty"`
+			RewardList string `xml:"RewardList,omitempty"`
+			ChequeList string `xml:"ChequeList,omitempty"`
 		} `xml:"RewardInqResult,omitempty"`
-		GarantiCardInd interface{} `xml:"GarantiCardInd,omitempty"`
+		GarantiCardInd string `xml:"GarantiCardInd,omitempty"`
 	} `xml:"Transaction,omitempty"`
 }
 
@@ -155,14 +153,13 @@ func SHA1(data string) (hash string) {
 
 func Transaction(request Request) (response Response) {
 	postdata, _ := xml.Marshal(request)
-	res, err := http.Post(EndPoints[request.Mode.(string)], "text/xml; charset=utf-8", strings.NewReader(strings.ToLower(xml.Header)+string(postdata)))
+	res, err := http.Post(EndPoints[request.Mode], "text/xml; charset=utf-8", bytes.NewReader(postdata))
 	if err != nil {
 		log.Println(err)
 		return response
 	}
 	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(string(data))
-	xml.Unmarshal([]byte(strings.ToLower(xml.Header)+string(data)), &response)
+	decoder := xml.NewDecoder(res.Body)
+	decoder.Decode(&response)
 	return response
 }
