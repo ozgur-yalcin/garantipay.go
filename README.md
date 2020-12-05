@@ -23,7 +23,7 @@ import (
 
 func main() {
 	request := garantipay.Request{}
-	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
+	request.Mode = "PROD" // TEST : "TEST" - PRODUCTION "PROD"
 	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
@@ -74,7 +74,7 @@ import (
 
 func main() {
 	request := garantipay.Request{}
-	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
+	request.Mode = "PROD" // TEST : "TEST" - PRODUCTION "PROD"
 	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
@@ -112,7 +112,7 @@ import (
 
 func main() {
 	request := garantipay.Request{}
-	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
+	request.Mode = "PROD" // TEST : "TEST" - PRODUCTION "PROD"
 	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
@@ -121,8 +121,6 @@ func main() {
 	// İptal
 	request.Order.OrderID = "SISTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  // Sipariş numarası (zorunlu)
 	request.Customer.IPAddress = "1.2.3.4"                          // IP adresi (zorunlu)
-	request.Transaction.Amount = "100"                              // İade tutarı (1,00 TL -> 100) Son 2 hane kuruş
-	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "void"
 
