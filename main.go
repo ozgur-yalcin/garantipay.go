@@ -18,10 +18,10 @@ func main() {
 	request.Terminal.ProvUserID = "PROVAUT" // Prov. Kullanıcı adı (satış için)
 	// Satış
 	request.Order.OrderID = ""                                      // Sipariş numarası (boş bırakılacak)
-	request.Customer.IPAddress = "127.0.0.1"                        // Müşteri IP adresi (zorunlu)
+	request.Customer.IPAddress = "1.2.3.4"                          // Müşteri IP adresi (zorunlu)
 	request.Card.Number = "4242424242424242"                        // Kart numarası
-	request.Card.ExpireDate = "1110"                                // Son kullanma tarihi (Ay ve Yılın son 2 hanesi) MMYY
-	request.Card.CVV2 = ""                                          // Cvv2 Kodu (kartın arka yüzündeki 3 haneli numara)
+	request.Card.ExpireDate = "0220"                                // Son kullanma tarihi (Ay ve Yılın son 2 hanesi) MMYY
+	request.Card.CVV2 = "123"                                       // Cvv2 Kodu (kartın arka yüzündeki 3 haneli numara)
 	request.Transaction.Amount = "100"                              // Satış tutarı (1,00 TL -> 100) Son 2 hane kuruş
 	request.Transaction.InstallmentCnt = ""                         // Taksit sayısı
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
