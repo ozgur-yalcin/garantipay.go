@@ -121,7 +121,8 @@ func main() {
 	// İptal
 	request.Order.OrderID = "SISTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  // Sipariş numarası (zorunlu)
 	request.Customer.IPAddress = "1.2.3.4"                          // IP adresi (zorunlu)
-	request.Transaction.MotoInd = "H"
+	request.Transaction.Amount = "100"                              // İptal tutarı (1,00 TL -> 100) Son 2 hane kuruş
+	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.Type = "void"
 
 	password := "123qweASD" // PROVRFN kullanıcı şifresi
