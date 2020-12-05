@@ -43,7 +43,8 @@ func main() {
 	request.Order.AddressList.Address.Type = "B"
 	request.Order.AddressList.Address.Company = ""     // Fatura unvanı
 	request.Order.AddressList.Address.PhoneNumber = "" // Telefon numarası
-	password := "123qweASD"
+
+	password := "123qweASD" // PROVAUT kullanıcı şifresi
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
 	hashdata := request.Order.OrderID + request.Terminal.ID + request.Card.Number + request.Transaction.Amount + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
@@ -86,7 +87,8 @@ func main() {
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "refund"
-	password := "123qweASD"
+
+	password := "123qweASD" // PROVRFN kullanıcı şifresi
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
 	hashdata := request.Order.OrderID + request.Terminal.ID + request.Card.Number + request.Transaction.Amount + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
@@ -123,7 +125,8 @@ func main() {
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "void"
-	password := "123qweASD"
+
+	password := "123qweASD" // PROVRFN kullanıcı şifresi
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
 	hashdata := request.Order.OrderID + request.Terminal.ID + request.Card.Number + request.Transaction.Amount + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))

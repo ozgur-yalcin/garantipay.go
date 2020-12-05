@@ -30,7 +30,8 @@ func main() {
 	request.Order.AddressList.Address.Type = "B"
 	request.Order.AddressList.Address.Company = ""     // Fatura unvanı
 	request.Order.AddressList.Address.PhoneNumber = "" // Telefon numarası
-	password := "123qweASD"
+
+	password := "123qweASD" // PROVAUT kullanıcı şifresi
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
 	hashdata := request.Order.OrderID + request.Terminal.ID + request.Card.Number + request.Transaction.Amount + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
