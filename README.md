@@ -85,7 +85,6 @@ func main() {
 	request.Customer.IPAddress = "1.2.3.4"                          // IP adresi (zorunlu)
 	request.Transaction.Amount = "100"                              // İade tutarı (1,00 TL -> 100) Son 2 hane kuruş
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
-	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "refund"
 
 	password := "123qweASD" // PROVRFN kullanıcı şifresi
