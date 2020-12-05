@@ -35,7 +35,8 @@ func main() {
 	hashdata := request.Order.OrderID + request.Terminal.ID + request.Card.Number + request.Transaction.Amount + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
 	// 3D (varsa)
-	//request.Transaction.CardholderPresentCode = "0"
+	//request.Transaction.CardholderPresentCode = "13"
+	//request.Transaction.Secure3D.Md = ""
 	//request.Transaction.Secure3D.TxnID = ""
 	//request.Transaction.Secure3D.SecurityLevel = ""
 	//request.Transaction.Secure3D.AuthenticationCode = ""

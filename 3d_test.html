@@ -26,7 +26,7 @@
 <input type="hidden" name="customeripaddress" id="customeremailaddress">
 <input type="hidden" name="txntype" id="txntype" value="sales">
 <input type="hidden" name="txnamount" id="txnamount" value="100">
-<input type="hidden" name="txninstallmentcount" id="txninstallmentcount" value="0">
+<input type="hidden" name="txninstallmentcount" id="txninstallmentcount" value="">
 <input type="hidden" name="txncurrencycode" id="txncurrencycode" value="949">
 <input type="hidden" name="txnmotoind" id="txntype" value="H">
 <input type="hidden" name="orderid" id="orderid" value="">
@@ -54,8 +54,8 @@ return pattern.replace(/XX/g,() => array[idx++].toString(16).padStart(2, "0"),
 // bu kısım test etmek için yazılmıştır. buradaki işlem backend tarafında yapılmalıdır !
 var securekey = "12345678".split("").map(c => c.charCodeAt(0).toString(16).padStart(2, "0")).join("");
 var password = "123qweASD";
-document.getElementById("txntimestamp").value = new Date().getTime();
 document.getElementById("orderid").value = uuid4();
+document.getElementById("txntimestamp").value = new Date().getTime();
 var hashpass = CryptoJS.SHA1(password + document.getElementById("terminalid").value.padStart(9, "0")).toString(CryptoJS.enc.Hex).toUpperCase();
 var hashstr = document.getElementById("terminalid").value + document.getElementById("orderid").value + document.getElementById("txnamount").value + document.getElementById("successurl").value + document.getElementById("errorurl").value + document.getElementById("txntype").value + document.getElementById("txninstallmentcount").value + securekey + hashpass;
 document.getElementById("secure3dhash").value = CryptoJS.SHA1(hashstr).toString(CryptoJS.enc.Hex).toUpperCase();
