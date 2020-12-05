@@ -29,16 +29,17 @@
 <input type="hidden" name="txninstallmentcount" id="txninstallmentcount" value="">
 <input type="hidden" name="txncurrencycode" id="txncurrencycode" value="949">
 <input type="hidden" name="txnmotoind" id="txntype" value="H">
-<input type="hidden" name="orderid" id="orderid" value="">
+<input type="hidden" name="orderid" id="orderid">
 <input type="hidden" name="successurl" id="successurl" value="https://www.example.com/?islem=basarili">
 <input type="hidden" name="errorurl" id="errorurl" value="https://www.example.com/?islem=basarisiz">
-<input type="hidden" name="txntimestamp" id="txntimestamp" value="">
-<input type="hidden" name="secure3dhash" id="secure3dhash" value="">
+<input type="hidden" name="txntimestamp" id="txntimestamp">
+<input type="hidden" name="secure3dhash" id="secure3dhash">
 <input type="hidden" name="refreshtime" id="refreshtime" value="60">
 <input type="hidden" name="lang" id="lang" value="tr">
 </form>
 </center>
 <script>
+// bu kısım test etmek için yazılmıştır. buradaki işlem backend tarafında yapılmalıdır !
 function uuid4() {
 let array = new Uint8Array(16)
 crypto.getRandomValues(array)
@@ -51,13 +52,12 @@ let idx = 0
 return pattern.replace(/XX/g,() => array[idx++].toString(16).padStart(2, "0"),
 )
 }
-// bu kısım test etmek için yazılmıştır. buradaki işlem backend tarafında yapılmalıdır !
-var securekey = "12345678".split("").map(c => c.charCodeAt(0).toString(16).padStart(2, "0")).join("");
-var password = "123qweASD";
+var securekey = "12345678"; // 24 byte hash oluşturulan anahtar
+var password = "123qweASD"; // PROVOOS kullanıcı şifresi
 document.getElementById("orderid").value = uuid4();
 document.getElementById("txntimestamp").value = new Date().getTime();
 var hashpass = CryptoJS.SHA1(password + document.getElementById("terminalid").value.padStart(9, "0")).toString(CryptoJS.enc.Hex).toUpperCase();
-var hashstr = document.getElementById("terminalid").value + document.getElementById("orderid").value + document.getElementById("txnamount").value + document.getElementById("successurl").value + document.getElementById("errorurl").value + document.getElementById("txntype").value + document.getElementById("txninstallmentcount").value + securekey + hashpass;
+var hashstr = document.getElementById("terminalid").value + document.getElementById("orderid").value + document.getElementById("txnamount").value + document.getElementById("successurl").value + document.getElementById("errorurl").value + document.getElementById("txntype").value + document.getElementById("txninstallmentcount").value + securekey.split("").map(c => c.charCodeAt(0).toString(16).padStart(2, "0")).join("") + hashpass;
 document.getElementById("secure3dhash").value = CryptoJS.SHA1(hashstr).toString(CryptoJS.enc.Hex).toUpperCase();
 </script>
 </body>
