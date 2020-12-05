@@ -36,6 +36,7 @@ func main() {
 	request.Card.ExpireDate = "1110"                                // Son kullanma tarihi (Ay ve Yılın son 2 hanesi) MMYY
 	request.Card.CVV2 = ""                                          // Cvv2 Kodu (kartın arka yüzündeki 3 haneli numara)
 	request.Transaction.Amount = "100"                              // Satış tutarı (1,00 TL -> 100) Son 2 hane kuruş
+	request.Transaction.InstallmentCnt = ""                         // Taksit sayısı
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
 	request.Transaction.MotoInd = "H"
 	request.Transaction.Type = "sales"
@@ -47,7 +48,8 @@ func main() {
 	hashdata := request.Order.OrderID + request.Terminal.ID + request.Card.Number + request.Transaction.Amount + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
 	// 3D (varsa)
-	//request.Transaction.CardholderPresentCode = "0"
+	//request.Transaction.CardholderPresentCode = "13"
+	//request.Transaction.Secure3D.Md = ""
 	//request.Transaction.Secure3D.TxnID = ""
 	//request.Transaction.Secure3D.SecurityLevel = ""
 	//request.Transaction.Secure3D.AuthenticationCode = ""
