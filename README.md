@@ -23,11 +23,11 @@ import (
 
 func main() {
 	request := garantipay.Request{}
-	request.Mode = "PROD" // TEST : "TEST" - PRODUCTION "PROD"
+	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
 	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
-	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
+	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı (satış için)
 	request.Terminal.ProvUserID = "PROVAUT" // Prov. Kullanıcı adı (satış için)
 	// Satış
 	request.Order.OrderID = ""                                      // Sipariş numarası (boş bırakılacak)
@@ -38,7 +38,7 @@ func main() {
 	request.Transaction.Amount = "100"                              // Satış tutarı (1,00 TL -> 100) Son 2 hane kuruş
 	request.Transaction.InstallmentCnt = ""                         // Taksit sayısı
 	request.Transaction.CurrencyCode = garantipay.Currencies["TRY"] // Para birimi
-	request.Transaction.MotoInd = "H"
+	request.Transaction.MotoInd = "N"
 	request.Transaction.Type = "sales"
 	request.Order.AddressList.Address.Type = "B"
 	request.Order.AddressList.Address.Company = ""     // Fatura unvanı
@@ -74,11 +74,11 @@ import (
 
 func main() {
 	request := garantipay.Request{}
-	request.Mode = "PROD" // TEST : "TEST" - PRODUCTION "PROD"
+	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
 	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
-	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
+	request.Terminal.UserID = "PROVRFN"     // Kullanıcı adı (iptal/iade için)
 	request.Terminal.ProvUserID = "PROVRFN" // Prov. Kullanıcı adı (iptal/iade için)
 	// İade
 	request.Order.OrderID = "SISTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  // Sipariş numarası (zorunlu)
@@ -111,11 +111,11 @@ import (
 
 func main() {
 	request := garantipay.Request{}
-	request.Mode = "PROD" // TEST : "TEST" - PRODUCTION "PROD"
+	request.Mode = "TEST" // TEST : "TEST" - PRODUCTION "PROD"
 	request.Version = "v1.0"
 	request.Terminal.ID = "111995"          // Terminal no
 	request.Terminal.MerchantID = "600218"  // İşyeri No
-	request.Terminal.UserID = "PROVAUT"     // Kullanıcı adı
+	request.Terminal.UserID = "PROVRFN"     // Kullanıcı adı (iptal/iade için)
 	request.Terminal.ProvUserID = "PROVRFN" // Prov. Kullanıcı adı (iptal/iade için)
 	// İptal
 	request.Order.OrderID = "SISTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  // Sipariş numarası (zorunlu)
