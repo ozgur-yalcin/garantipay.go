@@ -15,7 +15,7 @@
 <div><input type="text" name="cardcvv2" placeholder="xxx" style="width:55px;text-align:center;" maxlength="3"></div>
 <div style="margin-top:4px;"><input type="submit" value="Öde"></div>
 <input type="hidden" name="mode" id="mode" value="TEST">
-<input type="hidden" name="secure3dsecuritylevel" id="secure3dsecuritylevel" value="3D">
+<input type="hidden" name="secure3dsecuritylevel" id="secure3dsecuritylevel" value="CUSTOM_PAY">
 <input type="hidden" name="apiversion" id="apiversion" value="v1.0">
 <input type="hidden" name="terminaluserid" id="terminaluserid" value="PROVAUT">
 <input type="hidden" name="terminalprovuserid" id="terminalprovuserid" value="PROVOOS">
@@ -24,11 +24,17 @@
 <input type="hidden" name="companyname" id="companyname" value="İŞYERİ ADI">
 <input type="hidden" name="customeripaddress" id="customeripaddress" value="127.0.0.1">
 <input type="hidden" name="customeremailaddress" id="customeremailaddress">
-<input type="hidden" name="txntype" id="txntype" value="sales">
+<input type="hidden" name="garantipay" id="garantipay" value="E">
+<input type="hidden" name="txntype" id="txntype" value="gpdatarequest">
+<input type="hidden" name="txnsubtype" id="txnsubtype" value="sales">
 <input type="hidden" name="txnamount" id="txnamount" value="100">
 <input type="hidden" name="txninstallmentcount" id="txninstallmentcount" value="">
 <input type="hidden" name="txncurrencycode" id="txncurrencycode" value="949">
 <input type="hidden" name="txnmotoind" id="txnmotoind" value="H">
+<input type="hidden" name="bnsuseflag" id="bnsuseflag" value="E">
+<input type="hidden" name="fbbuseflag" id="fbbuseflag" value="E">
+<input type="hidden" name="chequeuseflag" id="chequeuseflag" value="H">
+<input type="hidden" name="mileuseflag" id="mileuseflag" value="H">
 <input type="hidden" name="orderid" id="orderid">
 <input type="hidden" name="successurl" id="successurl" value="https://www.example.com/?islem=basarili">
 <input type="hidden" name="errorurl" id="errorurl" value="https://www.example.com/?islem=basarisiz">
