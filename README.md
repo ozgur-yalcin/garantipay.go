@@ -1,12 +1,12 @@
-[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/OzqurYalcin/garantipay/blob/main/LICENSE.md)
-[![documentation](https://pkg.go.dev/badge/github.com/OzqurYalcin/garantipay)](https://pkg.go.dev/github.com/OzqurYalcin/garantipay/src)
+[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/ozgur-soft/garantipay/blob/main/LICENSE.md)
+[![documentation](https://pkg.go.dev/badge/github.com/ozgur-soft/garantipay)](https://pkg.go.dev/github.com/ozgur-soft/garantipay/src)
 
 # Garantipay
 Garanti Bankası Sanal POS API with golang
 
 # Installation
 ```bash
-go get github.com/OzqurYalcin/garantipay
+go get github.com/ozgur-soft/garantipay
 ```
 
 # Sanalpos satış işlemi
@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	garantipay "github.com/OzqurYalcin/garantipay/src"
+	garantipay "github.com/ozgur-soft/garantipay/src"
 )
 
 func main() {
@@ -69,7 +69,7 @@ import (
 	"fmt"
 	"strings"
 
-	garantipay "github.com/OzqurYalcin/garantipay/src"
+	garantipay "github.com/ozgur-soft/garantipay/src"
 )
 
 func main() {
@@ -106,7 +106,7 @@ import (
 	"fmt"
 	"strings"
 
-	garantipay "github.com/OzqurYalcin/garantipay/src"
+	garantipay "github.com/ozgur-soft/garantipay/src"
 )
 
 func main() {

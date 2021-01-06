@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	garantipay "github.com/OzqurYalcin/garantipay/src"
+	garantipay "github.com/ozgur-soft/garantipay/src"
 )
 
 func main() {
