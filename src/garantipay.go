@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/xml"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -25,69 +26,82 @@ var Currencies map[string]string = map[string]string{
 	"JPY": "392",
 }
 
+type API struct{}
+
 type Request struct {
-	XMLName     xml.Name `xml:"GVPSRequest,omitempty"`
-	Mode        string   `xml:"Mode,omitempty"`
-	Version     string   `xml:"Version,omitempty"`
-	ChannelCode string   `xml:"ChannelCode,omitempty"`
+	XMLName     xml.Name     `xml:"GVPSRequest,omitempty"`
+	Mode        interface{}  `xml:"Mode,omitempty"`
+	Version     interface{}  `xml:"Version,omitempty"`
+	ChannelCode interface{}  `xml:"ChannelCode,omitempty"`
+	Terminal    *Terminal    `xml:"Terminal,omitempty"`
+	Customer    *Customer    `xml:"Customer,omitempty"`
+	Card        *Card        `xml:"Card,omitempty"`
+	Order       *Order       `xml:"Order,omitempty"`
+	Transaction *Transaction `xml:"Transaction,omitempty"`
+}
 
-	Terminal struct {
-		MerchantID string `xml:"MerchantID,omitempty"`
-		ProvUserID string `xml:"ProvUserID,omitempty"`
-		UserID     string `xml:"UserID,omitempty"`
-		ID         string `xml:"ID,omitempty"`
-		HashData   string `xml:"HashData,omitempty"`
-	} `xml:"Terminal,omitempty"`
+type Terminal struct {
+	MerchantID interface{} `xml:"MerchantID,omitempty"`
+	ProvUserID interface{} `xml:"ProvUserID,omitempty"`
+	UserID     interface{} `xml:"UserID,omitempty"`
+	ID         interface{} `xml:"ID,omitempty"`
+	HashData   interface{} `xml:"HashData,omitempty"`
+}
 
-	Customer struct {
-		IPAddress    string `xml:"IPAddress,omitempty"`
-		EmailAddress string `xml:"EmailAddress,omitempty"`
-	} `xml:"Customer,omitempty"`
+type Customer struct {
+	IPAddress    interface{} `xml:"IPAddress,omitempty"`
+	EmailAddress interface{} `xml:"EmailAddress,omitempty"`
+}
 
-	Card struct {
-		Number     string `xml:"Number,omitempty"`
-		ExpireDate string `xml:"ExpireDate,omitempty"`
-		CVV2       string `xml:"CVV2,omitempty"`
-	} `xml:"Card,omitempty"`
+type Card struct {
+	Number     interface{} `xml:"Number,omitempty"`
+	ExpireDate interface{} `xml:"ExpireDate,omitempty"`
+	CVV2       interface{} `xml:"CVV2,omitempty"`
+}
 
-	Order struct {
-		OrderID     string `xml:"OrderID,omitempty"`
-		GroupID     string `xml:"GroupID,omitempty"`
-		AddressList struct {
-			Address struct {
-				Type        string `xml:"Type,omitempty"`
-				Name        string `xml:"Name,omitempty"`
-				LastName    string `xml:"LastName,omitempty"`
-				Company     string `xml:"Company,omitempty"`
-				Text        string `xml:"Text,omitempty"`
-				City        string `xml:"City,omitempty"`
-				District    string `xml:"District,omitempty"`
-				Country     string `xml:"Country,omitempty"`
-				PostalCode  string `xml:"PostalCode,omitempty"`
-				PhoneNumber string `xml:"PhoneNumber,omitempty"`
-				GsmNumber   string `xml:"GsmNumber,omitempty"`
-				FaxNumber   string `xml:"FaxNumber,omitempty"`
-			} `xml:"Address,omitempty"`
-		} `xml:"AddressList,omitempty"`
-	} `xml:"Order,omitempty"`
+type Order struct {
+	OrderID     interface{}  `xml:"OrderID,omitempty"`
+	GroupID     interface{}  `xml:"GroupID,omitempty"`
+	AddressList *AddressList `xml:"AddressList,omitempty"`
+}
 
-	Transaction struct {
-		Type                  string `xml:"Type,omitempty"`
-		SubType               string `xml:"SubType,omitempty"`
-		FirmCardNo            string `xml:"FirmCardNo,omitempty"`
-		InstallmentCnt        string `xml:"InstallmentCnt,omitempty"`
-		Amount                string `xml:"Amount,omitempty"`
-		CurrencyCode          string `xml:"CurrencyCode,omitempty"`
-		CardholderPresentCode string `xml:"CardholderPresentCode,omitempty"`
-		MotoInd               string `xml:"MotoInd,omitempty"`
-		Description           string `xml:"Description,omitempty"`
-		Secure3D              struct {
-			AuthenticationCode string `xml:"AuthenticationCode,omitempty"`
-			SecurityLevel      string `xml:"SecurityLevel,omitempty"`
-			TxnID              string `xml:"TxnID,omitempty"`
-			Md                 string `xml:"Md,omitempty"`
-		} `xml:"Secure3D,omitempty"`
-	} `xml:"Transaction,omitempty"`
+type AddressList struct {
+	Address *Address `xml:"Address,omitempty"`
+}
+
+type Address struct {
+	Type        interface{} `xml:"Type,omitempty"`
+	Name        interface{} `xml:"Name,omitempty"`
+	LastName    interface{} `xml:"LastName,omitempty"`
+	Company     interface{} `xml:"Company,omitempty"`
+	Text        interface{} `xml:"Text,omitempty"`
+	City        interface{} `xml:"City,omitempty"`
+	District    interface{} `xml:"District,omitempty"`
+	Country     interface{} `xml:"Country,omitempty"`
+	PostalCode  interface{} `xml:"PostalCode,omitempty"`
+	PhoneNumber interface{} `xml:"PhoneNumber,omitempty"`
+	GsmNumber   interface{} `xml:"GsmNumber,omitempty"`
+	FaxNumber   interface{} `xml:"FaxNumber,omitempty"`
+}
+
+type Transaction struct {
+	Type                  interface{} `xml:"Type,omitempty"`
+	SubType               interface{} `xml:"SubType,omitempty"`
+	FirmCardNo            interface{} `xml:"FirmCardNo,omitempty"`
+	InstallmentCnt        interface{} `xml:"InstallmentCnt,omitempty"`
+	Amount                interface{} `xml:"Amount,omitempty"`
+	CurrencyCode          interface{} `xml:"CurrencyCode,omitempty"`
+	CardholderPresentCode interface{} `xml:"CardholderPresentCode,omitempty"`
+	MotoInd               interface{} `xml:"MotoInd,omitempty"`
+	Description           interface{} `xml:"Description,omitempty"`
+	Secure3D              *Secure3D   `xml:"Secure3D,omitempty"`
+}
+
+type Secure3D struct {
+	AuthenticationCode interface{} `xml:"AuthenticationCode,omitempty"`
+	SecurityLevel      interface{} `xml:"SecurityLevel,omitempty"`
+	TxnID              interface{} `xml:"TxnID,omitempty"`
+	Md                 interface{} `xml:"Md,omitempty"`
 }
 
 type Response struct {
@@ -151,9 +165,10 @@ func SHA1(data string) (hash string) {
 	return hash
 }
 
-func Transaction(request Request) (response Response) {
-	postdata, _ := xml.Marshal(request)
-	res, err := http.Post(EndPoints[request.Mode], "text/xml; charset=utf-8", bytes.NewReader(postdata))
+func (api *API) Transaction(request *Request) (response Response) {
+	postdata, _ := xml.MarshalIndent(request, " ", " ")
+	fmt.Println(string(postdata))
+	res, err := http.Post(EndPoints[request.Mode.(string)], "text/xml; charset=utf-8", bytes.NewReader(postdata))
 	if err != nil {
 		log.Println(err)
 		return response
