@@ -5,7 +5,6 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/xml"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -166,8 +165,7 @@ func SHA1(data string) (hash string) {
 }
 
 func (api *API) Transaction(request *Request) (response Response) {
-	postdata, _ := xml.MarshalIndent(request, " ", " ")
-	fmt.Println(string(postdata))
+	postdata, _ := xml.Marshal(request)
 	res, err := http.Post(EndPoints[request.Mode.(string)], "text/xml; charset=utf-8", bytes.NewReader(postdata))
 	if err != nil {
 		log.Println(err)
