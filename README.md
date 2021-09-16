@@ -14,6 +14,7 @@ go get github.com/ozgur-soft/garantipay
 package main
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"strings"
@@ -62,7 +63,7 @@ func main() {
 	//request.Transaction.Secure3D.SecurityLevel = ""
 	//request.Transaction.Secure3D.AuthenticationCode = ""
 	//request.Transaction.CardholderPresentCode = "13"
-	response := api.Transaction(request)
+	response := api.Transaction(context.Background(), request)
 	pretty, _ := xml.MarshalIndent(response, " ", " ")
 	fmt.Println(string(pretty))
 }
@@ -73,6 +74,7 @@ func main() {
 package main
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"strings"
@@ -103,7 +105,7 @@ func main() {
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
 	hashdata := fmt.Sprintf("%v", request.Order.OrderID) + fmt.Sprintf("%v", request.Terminal.ID) + fmt.Sprintf("%v", request.Transaction.Amount) + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
-	response := api.Transaction(request)
+	response := api.Transaction(context.Background(), request)
 	pretty, _ := xml.MarshalIndent(response, " ", " ")
 	fmt.Println(string(pretty))
 }
@@ -114,6 +116,7 @@ func main() {
 package main
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"strings"
@@ -144,7 +147,7 @@ func main() {
 	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", request.Terminal.ID)))
 	hashdata := fmt.Sprintf("%v", request.Order.OrderID) + fmt.Sprintf("%v", request.Terminal.ID) + fmt.Sprintf("%v", request.Transaction.Amount) + hashpassword
 	request.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
-	response := api.Transaction(request)
+	response := api.Transaction(context.Background(), request)
 	pretty, _ := xml.MarshalIndent(response, " ", " ")
 	fmt.Println(string(pretty))
 }
