@@ -2,6 +2,7 @@ package garantipay
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/xml"
@@ -164,15 +165,26 @@ func SHA1(data string) (hash string) {
 	return hash
 }
 
-func (api *API) Transaction(request *Request) (response Response) {
-	postdata, _ := xml.Marshal(request)
-	res, err := http.Post(EndPoints[request.Mode.(string)], "text/xml; charset=utf-8", bytes.NewReader(postdata))
+func (api *API) Transaction(ctx context.Context, req *Request) (res Response) {
+	postdata, err := xml.Marshal(req)
 	if err != nil {
 		log.Println(err)
-		return response
+		return res
 	}
-	defer res.Body.Close()
-	decoder := xml.NewDecoder(res.Body)
+	client := new(http.Client)
+	request, err := http.NewRequestWithContext(ctx, EndPoints[req.Mode.(string)], "POST", bytes.NewReader(postdata))
+	if err != nil {
+		log.Println(err)
+		return res
+	}
+	request.Header.Set("Content-Type", "text/xml; charset=utf-8")
+	response, err := client.Do(request)
+	if err != nil {
+		log.Println(err)
+		return res
+	}
+	defer response.Body.Close()
+	decoder := xml.NewDecoder(response.Body)
 	decoder.Decode(&response)
-	return response
+	return res
 }

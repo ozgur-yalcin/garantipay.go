@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"strings"
@@ -49,7 +50,7 @@ func main() {
 	//request.Transaction.Secure3D.SecurityLevel = ""
 	//request.Transaction.Secure3D.AuthenticationCode = ""
 	//request.Transaction.CardholderPresentCode = "13"
-	response := api.Transaction(request)
+	response := api.Transaction(context.Background(), request)
 	pretty, _ := xml.MarshalIndent(response, " ", " ")
 	fmt.Println(string(pretty))
 }
