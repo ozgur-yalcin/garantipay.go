@@ -1,3 +1,3 @@
-module github.com/ozgur-soft/garantipay
+module github.com/ozgur-soft/garantipay.go
 
-go 1.15
+go 1.17
