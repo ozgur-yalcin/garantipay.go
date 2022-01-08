@@ -8,6 +8,7 @@ import (
 	"encoding/xml"
 	"log"
 	"net/http"
+	"strings"
 )
 
 var EndPoints map[string]string = map[string]string{
@@ -54,9 +55,9 @@ type Customer struct {
 }
 
 type Card struct {
-	Number     interface{} `xml:"Number,omitempty"`
-	ExpireDate interface{} `xml:"ExpireDate,omitempty"`
-	CVV2       interface{} `xml:"CVV2,omitempty"`
+	Number interface{} `xml:"Number,omitempty"`
+	Expiry interface{} `xml:"ExpireDate,omitempty"`
+	Code   interface{} `xml:"CVV2,omitempty"`
 }
 
 type Order struct {
@@ -121,9 +122,9 @@ type Response struct {
 	} `xml:"Customer,omitempty"`
 
 	Card struct {
-		Number     string `xml:"Number,omitempty"`
-		ExpireDate string `xml:"ExpireDate,omitempty"`
-		CVV2       string `xml:"CVV2,omitempty"`
+		Number string `xml:"Number,omitempty"`
+		Expiry string `xml:"ExpireDate,omitempty"`
+		Code   string `xml:"CVV2,omitempty"`
 	} `xml:"Card,omitempty"`
 
 	Order struct {
@@ -163,6 +164,78 @@ func SHA1(data string) (hash string) {
 	h.Write([]byte(data))
 	hash = hex.EncodeToString(h.Sum(nil))
 	return hash
+}
+
+func Api(terminalid, merchantid string) (*API, *Request) {
+	api := new(API)
+	request := new(Request)
+	request.Terminal = new(Terminal)
+	request.Customer = new(Customer)
+	request.Card = new(Card)
+	request.Order = new(Order)
+	request.Transaction = new(Transaction)
+	request.Version = "v1.0"
+	request.Terminal.ID = terminalid
+	request.Terminal.MerchantID = merchantid
+	return api, request
+}
+
+func (request *Request) SetMode(mode string) {
+	request.Mode = mode
+}
+
+func (request *Request) SetIPAddress(ip string) {
+	request.Customer.IPAddress = ip
+}
+
+func (request *Request) SetCardNumber(number string) {
+	request.Card.Number = number
+}
+
+func (request *Request) SetCardExpiry(month, year string) {
+	request.Card.Expiry = month + year
+}
+
+func (request *Request) SetCardCode(code string) {
+	request.Card.Code = code
+}
+
+func (request *Request) SetAmount(total string) {
+	request.Transaction.Amount = strings.ReplaceAll(total, ".", "")
+}
+
+func (request *Request) SetInstalment(ins string) {
+	request.Transaction.InstallmentCnt = ins
+}
+
+func (request *Request) SetCurrency(currency string) {
+	request.Transaction.CurrencyCode = Currencies[currency]
+}
+
+func (request *Request) SetOrderId(oid string) {
+	request.Order.OrderID = oid
+}
+
+func (api *API) Pay(ctx context.Context, req *Request) Response {
+	req.Terminal.UserID = "PROVAUT"
+	req.Terminal.ProvUserID = "PROVAUT"
+	req.Transaction.Type = "sales"
+	req.Transaction.MotoInd = "N"
+	return api.Transaction(ctx, req)
+}
+
+func (api *API) Refund(ctx context.Context, req *Request) Response {
+	req.Terminal.UserID = "PROVRFN"
+	req.Terminal.ProvUserID = "PROVRFN"
+	req.Transaction.Type = "refund"
+	return api.Transaction(ctx, req)
+}
+
+func (api *API) Cancel(ctx context.Context, req *Request) Response {
+	req.Terminal.UserID = "PROVRFN"
+	req.Terminal.ProvUserID = "PROVRFN"
+	req.Transaction.Type = "void"
+	return api.Transaction(ctx, req)
 }
 
 func (api *API) Transaction(ctx context.Context, req *Request) (res Response) {
