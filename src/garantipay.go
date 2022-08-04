@@ -1,19 +1,26 @@
 package garantipay
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha1"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var EndPoints map[string]string = map[string]string{
 	"TEST": "https://sanalposprovtest.garanti.com.tr/VPServlet",
 	"PROD": "https://sanalposprov.garanti.com.tr/VPServlet",
+
+	"TEST3D": "https://sanalposprovtest.garanti.com.tr/servlet/gt3dengine",
+	"PROD3D": "https://sanalposprov.garanti.com.tr/servlet/gt3dengine",
 }
 
 var Currencies map[string]string = map[string]string{
@@ -27,13 +34,28 @@ var Currencies map[string]string = map[string]string{
 	"JPY": "392",
 }
 
-type API struct{}
+var CurrencyISO map[string]string = map[string]string{
+	"949": "TRY",
+	"840": "USD",
+	"978": "EUR",
+	"826": "GBP",
+	"392": "JPY",
+}
+
+type API struct {
+	ProvUser string
+	ProvPass string
+	Key      string
+}
 
 type Request struct {
 	XMLName     xml.Name     `xml:"GVPSRequest,omitempty"`
-	Mode        interface{}  `xml:"Mode,omitempty"`
-	Version     interface{}  `xml:"Version,omitempty"`
-	ChannelCode interface{}  `xml:"ChannelCode,omitempty"`
+	Mode        string       `xml:"Mode,omitempty" form:"mode,omitempty"`
+	Version     string       `xml:"Version,omitempty" form:"apiversion,omitempty"`
+	Company     string       `xml:",omitempty" form:"companyname,omitempty"`
+	RefreshTime string       `xml:",omitempty" form:"refreshtime,omitempty"`
+	Lang        string       `xml:",omitempty" form:"lang,omitempty"`
+	ChannelCode string       `xml:"ChannelCode,omitempty"`
 	Terminal    *Terminal    `xml:"Terminal,omitempty"`
 	Customer    *Customer    `xml:"Customer,omitempty"`
 	Card        *Card        `xml:"Card,omitempty"`
@@ -42,27 +64,30 @@ type Request struct {
 }
 
 type Terminal struct {
-	MerchantID interface{} `xml:"MerchantID,omitempty"`
-	ProvUserID interface{} `xml:"ProvUserID,omitempty"`
-	UserID     interface{} `xml:"UserID,omitempty"`
-	ID         interface{} `xml:"ID,omitempty"`
-	HashData   interface{} `xml:"HashData,omitempty"`
+	MerchantID string `xml:"MerchantID,omitempty" form:"terminalmerchantid,omitempty"`
+	ProvUserID string `xml:"ProvUserID,omitempty" form:"terminalprovuserid,omitempty"`
+	UserID     string `xml:"UserID,omitempty" form:"terminaluserid,omitempty"`
+	ID         string `xml:"ID,omitempty" form:"terminalid,omitempty"`
+	Hash       string `xml:"HashData,omitempty" form:"secure3dhash,omitempty"`
+	Level      string `xml:",omitempty" form:"secure3dsecuritylevel,omitempty"`
 }
 
 type Customer struct {
-	IPAddress    interface{} `xml:"IPAddress,omitempty"`
-	EmailAddress interface{} `xml:"EmailAddress,omitempty"`
+	IPAddress    string `xml:"IPAddress,omitempty" form:"customeripaddress,omitempty"`
+	EmailAddress string `xml:"EmailAddress,omitempty" form:"customeremailaddress,omitempty"`
 }
 
 type Card struct {
-	Number interface{} `xml:"Number,omitempty"`
-	Expiry interface{} `xml:"ExpireDate,omitempty"`
-	Code   interface{} `xml:"CVV2,omitempty"`
+	Number string `xml:"Number,omitempty" form:"cardnumber,omitempty"`
+	Expiry string `xml:"ExpireDate,omitempty"`
+	Month  string `xml:",omitempty" form:"cardexpiredatemonth,omitempty"`
+	Year   string `xml:",omitempty" form:"cardexpiredateyear,omitempty"`
+	Code   string `xml:"CVV2,omitempty" form:"cardcvv2,omitempty"`
 }
 
 type Order struct {
-	OrderID     interface{}  `xml:"OrderID,omitempty"`
-	GroupID     interface{}  `xml:"GroupID,omitempty"`
+	OrderId     string       `xml:"OrderID,omitempty" form:"orderid,omitempty"`
+	GroupId     string       `xml:"GroupID,omitempty"`
 	AddressList *AddressList `xml:"AddressList,omitempty"`
 }
 
@@ -71,38 +96,42 @@ type AddressList struct {
 }
 
 type Address struct {
-	Type        interface{} `xml:"Type,omitempty"`
-	Name        interface{} `xml:"Name,omitempty"`
-	LastName    interface{} `xml:"LastName,omitempty"`
-	Company     interface{} `xml:"Company,omitempty"`
-	Text        interface{} `xml:"Text,omitempty"`
-	City        interface{} `xml:"City,omitempty"`
-	District    interface{} `xml:"District,omitempty"`
-	Country     interface{} `xml:"Country,omitempty"`
-	PostalCode  interface{} `xml:"PostalCode,omitempty"`
-	PhoneNumber interface{} `xml:"PhoneNumber,omitempty"`
-	GsmNumber   interface{} `xml:"GsmNumber,omitempty"`
-	FaxNumber   interface{} `xml:"FaxNumber,omitempty"`
+	Type       string `xml:"Type,omitempty"`
+	Name       string `xml:"Name,omitempty"`
+	LastName   string `xml:"LastName,omitempty"`
+	Company    string `xml:"Company,omitempty" form:"cardholder,omitempty"`
+	Text       string `xml:"Text,omitempty"`
+	City       string `xml:"City,omitempty"`
+	District   string `xml:"District,omitempty"`
+	Country    string `xml:"Country,omitempty"`
+	PostalCode string `xml:"PostalCode,omitempty"`
+	Phone      string `xml:"PhoneNumber,omitempty" form:"phone,omitempty"`
+	Gsm        string `xml:"GsmNumber,omitempty"`
+	Fax        string `xml:"FaxNumber,omitempty"`
 }
 
 type Transaction struct {
-	Type                  interface{} `xml:"Type,omitempty"`
-	SubType               interface{} `xml:"SubType,omitempty"`
-	FirmCardNo            interface{} `xml:"FirmCardNo,omitempty"`
-	InstallmentCnt        interface{} `xml:"InstallmentCnt,omitempty"`
-	Amount                interface{} `xml:"Amount,omitempty"`
-	CurrencyCode          interface{} `xml:"CurrencyCode,omitempty"`
-	CardholderPresentCode interface{} `xml:"CardholderPresentCode,omitempty"`
-	MotoInd               interface{} `xml:"MotoInd,omitempty"`
-	Description           interface{} `xml:"Description,omitempty"`
-	Secure3D              *Secure3D   `xml:"Secure3D,omitempty"`
+	Type              string    `xml:"Type,omitempty" form:"txntype,omitempty"`
+	SubType           string    `xml:"SubType,omitempty"`
+	FirmCardNo        string    `xml:"FirmCardNo,omitempty"`
+	Installment       string    `xml:"InstallmentCnt,omitempty" form:"txninstallmentcount,omitempty"`
+	Amount            string    `xml:"Amount,omitempty" form:"txnamount,omitempty"`
+	Currency          string    `xml:"CurrencyCode,omitempty" form:"txncurrencycode,omitempty"`
+	MotoInd           string    `xml:"MotoInd,omitempty" form:"txnmotoind,omitempty"`
+	PresentCode       string    `xml:"CardholderPresentCode,omitempty"`
+	Description       string    `xml:"Description,omitempty"`
+	OriginalRetrefNum string    `xml:"OriginalRetrefNum,omitempty"`
+	Secure3D          *Secure3D `xml:"Secure3D,omitempty"`
+	Timestamp         string    `xml:",omitempty" form:"txntimestamp,omitempty"`
+	SuccessUrl        string    `xml:",omitempty" form:"successurl,omitempty"`
+	ErrorUrl          string    `xml:",omitempty" form:"errorurl,omitempty"`
 }
 
 type Secure3D struct {
-	AuthenticationCode interface{} `xml:"AuthenticationCode,omitempty"`
-	SecurityLevel      interface{} `xml:"SecurityLevel,omitempty"`
-	TxnID              interface{} `xml:"TxnID,omitempty"`
-	Md                 interface{} `xml:"Md,omitempty"`
+	CAVV string `xml:"AuthenticationCode,omitempty"`
+	ECI  string `xml:"SecurityLevel,omitempty"`
+	XID  string `xml:"TxnID,omitempty"`
+	MD   string `xml:"Md,omitempty"`
 }
 
 type Response struct {
@@ -128,8 +157,8 @@ type Response struct {
 	} `xml:"Card,omitempty"`
 
 	Order struct {
-		OrderID string `xml:"OrderID,omitempty"`
-		GroupID string `xml:"GroupID,omitempty"`
+		OrderId string `xml:"OrderID,omitempty"`
+		GroupId string `xml:"GroupID,omitempty"`
 	} `xml:"Order,omitempty"`
 
 	Transaction struct {
@@ -159,6 +188,42 @@ type Response struct {
 	} `xml:"Transaction,omitempty"`
 }
 
+func IPv4(r *http.Request) (ip string) {
+	ipv4 := []string{
+		r.Header.Get("X-Real-Ip"),
+		r.Header.Get("X-Forwarded-For"),
+		r.RemoteAddr,
+	}
+	for _, ipaddress := range ipv4 {
+		if ipaddress != "" {
+			ip = ipaddress
+			break
+		}
+	}
+	return strings.Split(ip, ":")[0]
+}
+
+func Random(n int) string {
+	const alphanum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var bytes = make([]byte, n)
+	rand.Seed(time.Now().UnixNano())
+	rand.Read(bytes)
+	for i, b := range bytes {
+		bytes[i] = alphanum[b%byte(len(alphanum))]
+	}
+	return string(bytes)
+}
+
+func HEX(data string) (hash string) {
+	b, err := hex.DecodeString(data)
+	if err != nil {
+		log.Println(err)
+		return hash
+	}
+	hash = string(b)
+	return hash
+}
+
 func SHA1(data string) (hash string) {
 	h := sha1.New()
 	h.Write([]byte(data))
@@ -166,17 +231,42 @@ func SHA1(data string) (hash string) {
 	return hash
 }
 
-func Api(terminalid, merchantid string) (*API, *Request) {
+func B64(data string) (hash string) {
+	hash = base64.StdEncoding.EncodeToString([]byte(data))
+	return hash
+}
+
+func D64(data string) []byte {
+	b, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	return b
+}
+
+func Hash(data string) string {
+	return B64(HEX(SHA1(data)))
+}
+
+func Api(merchant, terminal, provuser, provpass string) (*API, *Request) {
 	api := new(API)
+	api.ProvUser = provuser
+	api.ProvPass = provpass
 	request := new(Request)
 	request.Terminal = new(Terminal)
 	request.Customer = new(Customer)
 	request.Card = new(Card)
 	request.Order = new(Order)
+	request.Order.AddressList = new(AddressList)
+	request.Order.AddressList.Address = new(Address)
+	request.Order.AddressList.Address.Type = "B"
 	request.Transaction = new(Transaction)
-	request.Version = "v1.0"
-	request.Terminal.ID = terminalid
-	request.Terminal.MerchantID = merchantid
+	request.Version = "4.0"
+	request.Terminal.ID = terminal
+	request.Terminal.MerchantID = merchant
+	request.Terminal.UserID = provuser
+	request.Terminal.ProvUserID = provuser
 	return api, request
 }
 
@@ -188,76 +278,180 @@ func (request *Request) SetIPAddress(ip string) {
 	request.Customer.IPAddress = ip
 }
 
+func (request *Request) SetPhoneNumber(phone string) {
+	request.Order.AddressList.Address.Phone = phone
+}
+
+func (request *Request) SetCardHolder(holder string) {
+	request.Order.AddressList.Address.Company = holder
+}
+
 func (request *Request) SetCardNumber(number string) {
 	request.Card.Number = number
 }
 
 func (request *Request) SetCardExpiry(month, year string) {
 	request.Card.Expiry = month + year
+	request.Card.Month = month
+	request.Card.Year = year
 }
 
 func (request *Request) SetCardCode(code string) {
 	request.Card.Code = code
 }
 
-func (request *Request) SetAmount(total string) {
+func (request *Request) SetAmount(total string, currency string) {
 	request.Transaction.Amount = strings.ReplaceAll(total, ".", "")
+	request.Transaction.Currency = Currencies[currency]
 }
 
-func (request *Request) SetInstalment(ins string) {
-	request.Transaction.InstallmentCnt = ins
-}
-
-func (request *Request) SetCurrency(currency string) {
-	request.Transaction.CurrencyCode = Currencies[currency]
+func (request *Request) SetInstallment(ins string) {
+	request.Transaction.Installment = ins
 }
 
 func (request *Request) SetOrderId(oid string) {
-	request.Order.OrderID = oid
+	request.Order.OrderId = oid
 }
 
-func (api *API) Pay(ctx context.Context, req *Request) Response {
-	req.Terminal.UserID = "PROVAUT"
-	req.Terminal.ProvUserID = "PROVAUT"
+func (request *Request) SetLang(lang string) {
+	request.Lang = lang
+}
+
+func (api *API) PreAuth(ctx context.Context, req *Request) (Response, error) {
+	req.Transaction.Type = "preauth"
+	req.Transaction.MotoInd = "N"
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Order.OrderId + req.Terminal.ID + req.Card.Number + req.Transaction.Amount + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
+	return api.Transaction(ctx, req)
+}
+
+func (api *API) Auth(ctx context.Context, req *Request) (Response, error) {
 	req.Transaction.Type = "sales"
 	req.Transaction.MotoInd = "N"
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Order.OrderId + req.Terminal.ID + req.Card.Number + req.Transaction.Amount + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
 	return api.Transaction(ctx, req)
 }
 
-func (api *API) Refund(ctx context.Context, req *Request) Response {
-	req.Terminal.UserID = "PROVRFN"
-	req.Terminal.ProvUserID = "PROVRFN"
+func (api *API) PreAuth3D(ctx context.Context, req *Request) (Response, error) {
+	req.Transaction.Type = "preauth"
+	req.Transaction.MotoInd = "N"
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Order.OrderId + req.Terminal.ID + req.Card.Number + req.Transaction.Amount + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
+	return api.Transaction(ctx, req)
+}
+
+func (api *API) Auth3D(ctx context.Context, req *Request) (Response, error) {
+	req.Transaction.Type = "sales"
+	req.Transaction.MotoInd = "N"
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Order.OrderId + req.Terminal.ID + req.Card.Number + req.Transaction.Amount + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
+	return api.Transaction(ctx, req)
+}
+
+func (api *API) PreAuth3Dhtml(ctx context.Context, req *Request) (string, error) {
+	req.RefreshTime = "0"
+	req.Terminal.Level = "3D"
+	req.Transaction.Type = "preauth"
+	req.Transaction.MotoInd = "N"
+	req.Transaction.Timestamp = fmt.Sprintf("%v", time.Now().Unix())
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Terminal.ID + req.Order.OrderId + req.Transaction.Amount + req.Transaction.SuccessUrl + req.Transaction.ErrorUrl + req.Transaction.Type + req.Transaction.Installment + fmt.Sprintf("%x", api.Key) + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
+	return api.Transaction3D(ctx, req)
+}
+
+func (api *API) Auth3Dhtml(ctx context.Context, req *Request) (string, error) {
+	req.RefreshTime = "0"
+	req.Terminal.Level = "3D"
+	req.Transaction.Type = "sales"
+	req.Transaction.MotoInd = "N"
+	req.Transaction.Timestamp = fmt.Sprintf("%v", time.Now().Unix())
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Terminal.ID + req.Order.OrderId + req.Transaction.Amount + req.Transaction.SuccessUrl + req.Transaction.ErrorUrl + req.Transaction.Type + req.Transaction.Installment + fmt.Sprintf("%x", api.Key) + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
+	return api.Transaction3D(ctx, req)
+}
+
+func (api *API) PostAuth(ctx context.Context, req *Request) (Response, error) {
+	req.Transaction.Type = "postauth"
+	req.Transaction.MotoInd = "N"
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Order.OrderId + req.Terminal.ID + req.Transaction.Amount + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
+	return api.Transaction(ctx, req)
+}
+
+func (api *API) Refund(ctx context.Context, req *Request) (Response, error) {
 	req.Transaction.Type = "refund"
+	req.Transaction.MotoInd = "N"
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Order.OrderId + req.Terminal.ID + req.Transaction.Amount + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
 	return api.Transaction(ctx, req)
 }
 
-func (api *API) Cancel(ctx context.Context, req *Request) Response {
-	req.Terminal.UserID = "PROVRFN"
-	req.Terminal.ProvUserID = "PROVRFN"
+func (api *API) Cancel(ctx context.Context, req *Request) (Response, error) {
 	req.Transaction.Type = "void"
+	req.Transaction.MotoInd = "N"
+	hashpassword := strings.ToUpper(SHA1(api.ProvPass + fmt.Sprintf("%09v", req.Terminal.ID)))
+	hashdata := req.Order.OrderId + req.Terminal.ID + req.Transaction.Amount + hashpassword
+	req.Terminal.Hash = strings.ToUpper(SHA1(hashdata))
 	return api.Transaction(ctx, req)
 }
 
-func (api *API) Transaction(ctx context.Context, req *Request) (res Response) {
+func (api *API) Transaction(ctx context.Context, req *Request) (res Response, err error) {
 	postdata, err := xml.Marshal(req)
 	if err != nil {
-		log.Println(err)
-		return res
+		return res, err
 	}
-	request, err := http.NewRequestWithContext(ctx, "POST", EndPoints[req.Mode.(string)], bytes.NewReader(postdata))
+	request, err := http.NewRequestWithContext(ctx, "POST", EndPoints[req.Mode], strings.NewReader(xml.Header+string(postdata)))
 	if err != nil {
-		log.Println(err)
-		return res
+		return res, err
 	}
 	request.Header.Set("Content-Type", "text/xml; charset=utf-8")
 	client := new(http.Client)
 	response, err := client.Do(request)
 	if err != nil {
-		log.Println(err)
-		return res
+		return res, err
 	}
 	defer response.Body.Close()
 	decoder := xml.NewDecoder(response.Body)
-	decoder.Decode(&res)
-	return res
+	if err := decoder.Decode(&res); err != nil {
+		return res, err
+	}
+	switch res.Transaction.Response.Code {
+	case "00":
+		return res, nil
+	default:
+		return res, errors.New(strings.TrimSpace(res.Transaction.Response.SysErrMsg + " " + res.Transaction.Response.ErrorMsg))
+	}
+}
+
+func (api *API) Transaction3D(ctx context.Context, req *Request) (res string, err error) {
+	postdata, err := QueryString(req)
+	if err != nil {
+		return res, err
+	}
+	html := []string{}
+	html = append(html, `<!DOCTYPE html>`)
+	html = append(html, `<html>`)
+	html = append(html, `<head>`)
+	html = append(html, `<script type="text/javascript">function submitonload() {document.payment.submit();document.getElementById('button').remove();document.getElementById('body').insertAdjacentHTML("beforeend", "Lütfen bekleyiniz...");}</script>`)
+	html = append(html, `</head>`)
+	html = append(html, `<body onload="javascript:submitonload();" id="body" style="text-align:center;margin:10px;font-family:Arial;font-weight:bold;">`)
+	html = append(html, `<form action="`+EndPoints[req.Mode+"3D"]+`" method="post" name="payment">`)
+	for k := range postdata {
+		html = append(html, `<input type="hidden" name="`+k+`" value="`+postdata.Get(k)+`">`)
+	}
+	html = append(html, `<input type="submit" value="Gönder" id="button">`)
+	html = append(html, `</form>`)
+	html = append(html, `</body>`)
+	html = append(html, `</html>`)
+	res = B64(strings.Join(html, "\n"))
+	return res, err
 }
