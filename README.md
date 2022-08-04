@@ -17,50 +17,41 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	garantipay "github.com/ozgur-soft/garantipay.go/src"
 )
 
+// Pos bilgileri
+const (
+	envmode  = "PROD"    // Çalışma ortamı (Production : "PROD" - Test : "TEST")
+	merchant = ""        // İşyeri numarası
+	terminal = ""        // Terminal numarası
+	username = "PROVAUT" // PROVAUT
+	password = ""        // PROVAUT şifresi
+)
+
 func main() {
-	api, req := garantipay.Api("terminal no", "işyeri no")
-	req.SetMode("TEST")                   // TEST : "TEST" - PRODUCTION "PROD"
-	req.SetCardNumber("4242424242424242") // Kart numarası
-	req.SetCardExpiry("02", "20")         // Son kullanma tarihi (Ay ve Yılın son 2 hanesi) AAYY
-	req.SetCardCode("123")                // Cvv2 Kodu (kartın arka yüzündeki 3 haneli numara)
-	req.SetIPAddress("1.2.3.4")           // Müşteri IP adresi (zorunlu)
-	req.SetAmount("1.00")                 // Satış tutarı (zorunlu)
-	req.SetInstalment("")                 // Taksit sayısı (varsa)
-	req.SetCurrency("TRY")                // Para birimi
+	api, req := garantipay.Api(merchant, terminal, username, password)
+	req.SetMode(envmode)
+
+	req.SetIPAddress("1.2.3.4")           // Müşteri IPv4 adresi (zorunlu)
+	req.SetCardHolder("AD SOYAD")         // Kart sahibi (zorunlu)
+	req.SetCardNumber("4242424242424242") // Kart numarası (zorunlu)
+	req.SetCardExpiry("02", "20")         // Son kullanma tarihi - AA,YY (zorunlu)
+	req.SetCardCode("123")                // Kart arkasındaki 3 haneli numara (zorunlu)
+	req.SetPhoneNumber("05554443322")     // Müşteri telefon numarası (zorunlu)
+	req.SetAmount("1.00", "TRY")          // Satış tutarı ve para birimi (zorunlu)
+	req.SetInstallment("0")               // Taksit sayısı (varsa)
 	req.SetOrderId("")                    // Sipariş numarası (varsa)
-
-	// Kişisel bilgiler
-	req.Order.AddressList = new(garantipay.AddressList)
-	req.Order.AddressList.Address = new(garantipay.Address)
-	req.Order.AddressList.Address.Type = "B"
-	req.Order.AddressList.Address.Name = ""        // İsim
-	req.Order.AddressList.Address.LastName = ""    // Soyisim
-	req.Order.AddressList.Address.PhoneNumber = "" // Telefon numarası
-
-	// Hash
-	password := "123qweASD" // PROVAUT kullanıcı şifresi
-	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", req.Terminal.ID)))
-	hashdata := fmt.Sprintf("%v", req.Order.OrderID) + fmt.Sprintf("%v", req.Terminal.ID) + fmt.Sprintf("%v", req.Card.Number) + fmt.Sprintf("%v", req.Transaction.Amount) + hashpassword
-	req.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
-
-	// 3D (varsa)
-	//req.Transaction.Secure3D = new(garantipay.Secure3D)
-	//req.Transaction.Secure3D.Md = ""
-	//req.Transaction.Secure3D.TxnID = ""
-	//req.Transaction.Secure3D.SecurityLevel = ""
-	//req.Transaction.Secure3D.AuthenticationCode = ""
-	//req.Transaction.CardholderPresentCode = "13"
 
 	// Satış
 	ctx := context.Background()
-	res := api.Pay(ctx, req)
-	pretty, _ := xml.MarshalIndent(res, " ", " ")
-	fmt.Println(string(pretty))
+	if res, err := api.Auth(ctx, req); err == nil {
+		pretty, _ := xml.MarshalIndent(res, " ", " ")
+		fmt.Println(string(pretty))
+	} else {
+		fmt.Println(err)
+	}
 }
 ```
 
@@ -72,35 +63,35 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	garantipay "github.com/ozgur-soft/garantipay.go/src"
 )
 
-func main() {
-	api, req := garantipay.Api("terminal no", "işyeri no")
-	// TEST : "TEST" - PRODUCTION "PROD"
-	req.SetMode("TEST")
-	// Sipariş numarası (zorunlu)
-	req.SetOrderId("SISTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-	// İade tutarı (zorunlu)
-	req.SetAmount("1.00")
-	// Para birimi (zorunlu)
-	req.SetCurrency("TRY")
-	// IP adresi (zorunlu)
-	req.SetIPAddress("1.2.3.4")
+// Pos bilgileri
+const (
+	envmode  = "PROD"    // Çalışma ortamı (Production : "PROD" - Test : "TEST")
+	merchant = ""        // İşyeri numarası
+	terminal = ""        // Terminal numarası
+	username = "PROVRFN" // PROVRFN
+	password = ""        // PROVRFN şifresi
+)
 
-	// Hash
-	password := "123qweASD" // PROVRFN kullanıcı şifresi
-	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", req.Terminal.ID)))
-	hashdata := fmt.Sprintf("%v", req.Order.OrderID) + fmt.Sprintf("%v", req.Terminal.ID) + fmt.Sprintf("%v", req.Transaction.Amount) + hashpassword
-	req.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
+func main() {
+	api, req := garantipay.Api(merchant, terminal, username, password)
+	req.SetMode(envmode)
+
+	req.SetIPAddress("1.2.3.4")            // Müşteri IPv4 adresi (zorunlu)
+	req.SetAmount("1.00", "TRY")           // İade tutarı ve para birimi (zorunlu)
+	req.SetOrderId("SISTxxxxxxxxxxxxxxxx") // Sipariş numarası (zorunlu)
 
 	// İade
 	ctx := context.Background()
-	res := api.Refund(ctx, req)
-	pretty, _ := xml.MarshalIndent(res, " ", " ")
-	fmt.Println(string(pretty))
+	if res, err := api.Refund(ctx, req); err == nil {
+		pretty, _ := xml.MarshalIndent(res, " ", " ")
+		fmt.Println(string(pretty))
+	} else {
+		fmt.Println(err)
+	}
 }
 ```
 
@@ -112,34 +103,34 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"strings"
 
 	garantipay "github.com/ozgur-soft/garantipay.go/src"
 )
 
+// Pos bilgileri
+const (
+	envmode  = "PROD"    // Çalışma ortamı (Production : "PROD" - Test : "TEST")
+	merchant = ""        // İşyeri numarası
+	terminal = ""        // Terminal numarası
+	username = "PROVRFN" // PROVRFN
+	password = ""        // PROVRFN şifresi
+)
+
 func main() {
-	api, req := garantipay.Api("terminal no", "işyeri no")
-	// TEST : "TEST" - PRODUCTION "PROD"
-	req.SetMode("TEST")
-	// Sipariş numarası (zorunlu)
-	req.SetOrderId("SISTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-	// İptal tutarı (zorunlu)
-	req.SetAmount("1.00")
-	// Para birimi (zorunlu)
-	req.SetCurrency("TRY")
-	// IP adresi (zorunlu)
-	req.SetIPAddress("1.2.3.4")
+	api, req := garantipay.Api(merchant, terminal, username, password)
+	req.SetMode(envmode)
 
-	// Hash
-	password := "123qweASD" // PROVRFN kullanıcı şifresi
-	hashpassword := strings.ToUpper(garantipay.SHA1(password + fmt.Sprintf("%09v", req.Terminal.ID)))
-	hashdata := fmt.Sprintf("%v", req.Order.OrderID) + fmt.Sprintf("%v", req.Terminal.ID) + fmt.Sprintf("%v", req.Transaction.Amount) + hashpassword
-	req.Terminal.HashData = strings.ToUpper(garantipay.SHA1(hashdata))
+	req.SetIPAddress("1.2.3.4")            // Müşteri IPv4 adresi (zorunlu)
+	req.SetAmount("1.00", "TRY")           // İptal tutarı ve para birimi (zorunlu)
+	req.SetOrderId("SISTxxxxxxxxxxxxxxxx") // Sipariş numarası (zorunlu)
 
-	// İade
+	// İptal
 	ctx := context.Background()
-	res := api.Cancel(ctx, req)
-	pretty, _ := xml.MarshalIndent(res, " ", " ")
-	fmt.Println(string(pretty))
+	if res, err := api.Cancel(ctx, req); err == nil {
+		pretty, _ := xml.MarshalIndent(res, " ", " ")
+		fmt.Println(string(pretty))
+	} else {
+		fmt.Println(err)
+	}
 }
 ```
