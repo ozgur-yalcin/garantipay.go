@@ -270,6 +270,10 @@ func Api(merchant, terminal, provuser, provpass string) (*API, *Request) {
 	return api, request
 }
 
+func (api *API) SetStoreKey(key string) {
+	api.Key = key
+}
+
 func (request *Request) SetMode(mode string) {
 	request.Mode = mode
 }
