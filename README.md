@@ -2,14 +2,14 @@
 [![documentation](https://pkg.go.dev/badge/github.com/ozgur-soft/garantipay.go)](https://pkg.go.dev/github.com/ozgur-soft/garantipay.go/src)
 
 # Garantipay.go
-Garanti Bankası Virtual POS API with golang
+Garanti Bankası POS API with golang
 
 # Installation
 ```bash
 go get github.com/ozgur-soft/garantipay.go
 ```
 
-# Sanalpos satış işlemi
+# Satış
 ```go
 package main
 
@@ -55,7 +55,7 @@ func main() {
 }
 ```
 
-# Sanalpos iade işlemi
+# İade
 ```go
 package main
 
@@ -95,7 +95,7 @@ func main() {
 }
 ```
 
-# Sanalpos iptal işlemi
+# İptal
 ```go
 package main
 
