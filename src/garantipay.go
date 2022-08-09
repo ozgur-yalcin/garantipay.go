@@ -23,7 +23,7 @@ var EndPoints = map[string]string{
 	"PROD3D": "https://sanalposprov.garanti.com.tr/servlet/gt3dengine",
 }
 
-var Currencies = map[string]string{
+var CurrencyCode = map[string]string{
 	"TRY": "949",
 	"YTL": "949",
 	"TRL": "949",
@@ -306,7 +306,7 @@ func (request *Request) SetCardCode(code string) {
 
 func (request *Request) SetAmount(total string, currency string) {
 	request.Transaction.Amount = strings.ReplaceAll(total, ".", "")
-	request.Transaction.Currency = Currencies[currency]
+	request.Transaction.Currency = CurrencyCode[currency]
 }
 
 func (request *Request) SetInstallment(ins string) {
