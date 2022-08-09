@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-var EndPoints map[string]string = map[string]string{
+var EndPoints = map[string]string{
 	"TEST": "https://sanalposprovtest.garanti.com.tr/VPServlet",
 	"PROD": "https://sanalposprov.garanti.com.tr/VPServlet",
 
@@ -23,7 +23,7 @@ var EndPoints map[string]string = map[string]string{
 	"PROD3D": "https://sanalposprov.garanti.com.tr/servlet/gt3dengine",
 }
 
-var Currencies map[string]string = map[string]string{
+var Currencies = map[string]string{
 	"TRY": "949",
 	"YTL": "949",
 	"TRL": "949",
@@ -34,7 +34,7 @@ var Currencies map[string]string = map[string]string{
 	"JPY": "392",
 }
 
-var CurrencyISO map[string]string = map[string]string{
+var CurrencyISO = map[string]string{
 	"949": "TRY",
 	"840": "USD",
 	"978": "EUR",
