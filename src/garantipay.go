@@ -11,6 +11,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -428,11 +429,15 @@ func (api *API) Transaction(ctx context.Context, req *Request) (res Response, er
 	if err := decoder.Decode(&res); err != nil {
 		return res, err
 	}
-	switch res.Transaction.Response.Code {
-	case "00":
-		return res, nil
-	default:
-		return res, errors.New(strings.TrimSpace(res.Transaction.Response.SysErrMsg + " " + res.Transaction.Response.ErrorMsg))
+	if code, err := strconv.Atoi(res.Transaction.Response.Code); err == nil {
+		switch code {
+		case 0:
+			return res, nil
+		default:
+			return res, errors.New(res.Transaction.Response.ErrorMsg)
+		}
+	} else {
+		return res, errors.New(res.Transaction.Response.ErrorMsg)
 	}
 }
 
@@ -445,6 +450,7 @@ func (api *API) Transaction3D(ctx context.Context, req *Request) (res string, er
 	html = append(html, `<!DOCTYPE html>`)
 	html = append(html, `<html>`)
 	html = append(html, `<head>`)
+	html = append(html, `<meta http-equiv="Content-Type" content="text/html; charset=utf-8">`)
 	html = append(html, `<script type="text/javascript">function submitonload() {document.payment.submit();document.getElementById('button').remove();document.getElementById('body').insertAdjacentHTML("beforeend", "Lütfen bekleyiniz...");}</script>`)
 	html = append(html, `</head>`)
 	html = append(html, `<body onload="javascript:submitonload();" id="body" style="text-align:center;margin:10px;font-family:Arial;font-weight:bold;">`)
