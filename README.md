@@ -6,7 +6,7 @@ Garanti Bankası POS API with golang
 
 # Installation
 ```bash
-go get github.com/ozgur-soft/garantipay.go
+go get github.com/ozgur-yalcin/garantipay.go
 ```
 
 # Satış
@@ -18,7 +18,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	garantipay "github.com/ozgur-soft/garantipay.go/src"
+	garantipay "github.com/ozgur-yalcin/garantipay.go/src"
 )
 
 // Pos bilgileri
@@ -64,7 +64,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	garantipay "github.com/ozgur-soft/garantipay.go/src"
+	garantipay "github.com/ozgur-yalcin/garantipay.go/src"
 )
 
 // Pos bilgileri
@@ -104,7 +104,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	garantipay "github.com/ozgur-soft/garantipay.go/src"
+	garantipay "github.com/ozgur-yalcin/garantipay.go/src"
 )
 
 // Pos bilgileri
