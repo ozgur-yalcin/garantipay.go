@@ -1,3 +1,3 @@
-module github.com/ozgur-soft/garantipay.go
+module github.com/ozgur-yalcin/garantipay.go
 
 go 1.18
