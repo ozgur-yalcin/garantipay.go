@@ -1,5 +1,5 @@
-[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/ozgur-soft/garantipay.go/blob/main/LICENSE.md)
-[![documentation](https://pkg.go.dev/badge/github.com/ozgur-soft/garantipay.go)](https://pkg.go.dev/github.com/ozgur-soft/garantipay.go/src)
+[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/ozgur-yalcin/garantipay.go/blob/main/LICENSE.md)
+[![documentation](https://pkg.go.dev/badge/github.com/ozgur-yalcin/garantipay.go)](https://pkg.go.dev/github.com/ozgur-yalcin/garantipay.go/src)
 
 # Garantipay.go
 Garanti Bankası POS API with golang
