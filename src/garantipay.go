@@ -207,7 +207,8 @@ func IPv4(r *http.Request) (ip string) {
 func Random(n int) string {
 	const alphanum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	var bytes = make([]byte, n)
-	rand.Seed(time.Now().UnixNano())
+	source := rand.NewSource(time.Now().UnixNano())
+	rand := rand.New(source)
 	rand.Read(bytes)
 	for i, b := range bytes {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
